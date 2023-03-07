@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Edit item
+{% endblock %}
+
+
+{% block body %}
+
+<form action="/edit_item" method="POST">
+    {% csrf_token %}
+    
+    <label for="posting">Назва товару</label>
+    <input type="text" name="name_item_edit" value="{{ name_items_get_edit }}" placeholder="Введіть назву товару..." />    
+
+
+    <div class="form-group">        
+        <br>
+        <label for="posting">Текст посту</label>
+        <textarea class="form-control" name="description_item_edit" id="posting" cols="60" rows="6" required>{{ description_get_edit }}</textarea>
+
+    </div>
+    <br>
+
+    <label for="posting">Ваш телефон, щоб клієнти могли зв'язатися з вами</label>
+    <input type="text" name="phone_user_edit" value="{{ phone_get_edit }}" placeholder="Введіть ваш номер телефону..." />    
+
+    <br>
+    <br>
+
+    <label for="posting">Ціна товара</label>
+    <input type="text" name="price_item_edit" value="{{ price_get_edit }}" placeholder="Введіть ціну товару..." />  
+
+    <br>
+    <br>
+
+
+    <button type="submit">Редагувати товар</button>
+    
+
+</form>
+
+
+
+{% endblock %}

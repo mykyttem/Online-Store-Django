@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}
+My profile
+{% endblock %}
+
+
+{% block body %}
+     <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+		.profile {
+			border: 2px solid black;
+			padding: 10px;
+			margin: 20px 0;
+			width: 200px;
+			height: 700px;
+			float: left;
+			border-radius: 5px;
+			background-color: #f2f2f2;
+            position: fixed;
+         
+		}
+
+        .block {
+            background-color: #ffff;
+            width: 200px;
+            height: 200px;
+            padding: 20px;
+            margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
+            border-radius: 10px;
+            display: inline-block;
+          }
+
+
+	</style>
+
+
+<div class="profile" >
+    <h1>Profile</h1>
+    <hr>
+    <h2>Login: {{ login_user }}</h2>
+    <h2>Email: {{ email_user }}</h2>
+    <h2>ID: {{ id_user }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="logout_profile" value="my_profile">
+        <input type="submit" value="Вийти з профіля">
+    </form>
+
+    <br>
+    <a href="/create_item">Додати товар</a>
+
+</div>
+
+
+
+{% for x in myitems %}      
+    <div class="block">
+        <ul>
+            <!-- Edit button  -->
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="item_id" value="{{ x.id }}">
+                <input type="hidden" name="name_items" value="{{ x.name_items }}">
+                <input type="hidden" name="description_items" value="{{ x.description_items }}">
+                <input type="hidden" name="phone" value="{{ x.phone }}">
+                <input type="hidden" name="price" value="{{ x.price }}">
+                
+                
+                
+
+                <input type="submit" value="Edit item">
+                
+            </form>
+        
+            
+            <br>
+
+            <!-- Delete button  -->
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="item_id" value="{{ x.id }}">
+                <input type="hidden" name="delete_item" value="my_profile">
+                <input type="submit" value="Delete post">
+            </form>
+
+
+            <h1>Photo_item</h1>
+            <h4> {{ x.name_items }} </h4>
+            <h4> {{ x.price }} </h4>
+        </ul>
+    </div>
+
+    
+
+
+{% endfor %}  
+
+    
+
+{% endblock %}
