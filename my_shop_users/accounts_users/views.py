@@ -15,6 +15,8 @@ from datetime import datetime
 
 
 #TODO: ЗРОБИТИ iD ІЗ БІЛЬШЕ ЧИСЛ
+#TODO: добавити більше даних для користувача
+
 
 # Create your views here.
 def accounts_users(request):
@@ -27,8 +29,20 @@ def accounts_users(request):
         hashed_password = make_password(password_user)
 
 
+        # search email-dublicate user, from DB
+        search_email_dublicate = Registration.objects.filter(
+        Q(email_user = f'{email_user}'))
+
+        # search login-dublicate user, from DB
+        search_login_dublicate = Registration.objects.filter(
+        Q(login_user = f'{login_user}'))
+
+
+
         if len(login_user) < 3:
             return HttpResponse('Error, login name is too short')
+        if search_email_dublicate or search_login_dublicate:
+            messages.success(request, "Така пошта все зарегестрована")
         else:
             new_account = Registration(login_user=login_user, email_user=email_user, password_user=hashed_password)
             new_account.save()
@@ -84,21 +98,26 @@ def my_profile(request):
     id_user = request.session.get('id')
 
 
+    # button
     logout_profile = request.POST.get('logout_profile')
-
-
     delete_item = request.POST.get('delete_item') 
 
+
+    # global variabes for edit item
     global item_id
+
     global name_items_get_edit
     global description_get_edit
+    global category_get_items_edit
+
     global phone_get_edit
     global price_get_edit
 
-
+    # get field from items edit
     item_id = request.POST.get('item_id')
     name_items_get_edit = request.POST.get('name_items')
     description_get_edit = request.POST.get('description_items')
+    category_get_items_edit = request.POST.get('category_items')
     phone_get_edit = request.POST.get('phone')
     price_get_edit = request.POST.get('price')    
 
@@ -107,7 +126,7 @@ def my_profile(request):
         return HttpResponse('Ви забули увійти в аккаунт')
     
     myitems = Items.objects.filter(Q(author_id_item=f'{id_user}')).values # витягуєм тільки ті товари, які стоврив користувач
-
+ 
     context = {
         'login_user': login_user,
         'email_user': email_user,    
@@ -134,6 +153,7 @@ def my_profile(request):
        
             # print(name_items_get_edit)
             # print(description_get_edit)
+            # print(category_get_items_edit)
             # print(phone_get_edit)
             # print(price_get_edit)
             # print(item_id)
@@ -152,6 +172,9 @@ def create_item(request):
     if request.method == 'POST':
         name_item = request.POST['name_item']
         description_item = request.POST['description_item']
+        category_items = request.POST['category_items']
+
+
         phone_user = request.POST['phone_user']
         price_item = request.POST['price_item']
 
@@ -160,7 +183,7 @@ def create_item(request):
         # date create item
         date = datetime.now()
 
-        new_item = Items(name_items=name_item, description_items=description_item, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user)
+        new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user)
         new_item.save()
 
 
@@ -179,6 +202,7 @@ def edit_item(request):
     context = {
         'name_items_get_edit': name_items_get_edit,
         'description_get_edit': description_get_edit,
+        'category_get_items_edit': category_get_items_edit,        
         'phone_get_edit': phone_get_edit,
         'price_get_edit': price_get_edit
     }
@@ -187,6 +211,7 @@ def edit_item(request):
     if request.method == 'POST':
         name_item_edit = request.POST['name_item_edit']
         description_item_edit = request.POST['description_item_edit']
+        category_items_edit = request.POST['category_items_edit']
         phone_user_edit = request.POST['phone_user_edit']
         price_item_edit = request.POST['price_item_edit']
 
@@ -199,6 +224,7 @@ def edit_item(request):
 
             item_id_get.name_items = name_item_edit
             item_id_get.description_items = description_item_edit
+            item_id_get.category_items = category_items_edit
             item_id_get.phone = phone_user_edit
             item_id_get.price = price_item_edit
 

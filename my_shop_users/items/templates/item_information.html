@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ name_items }}
+{% endblock %}
+
+
+{% block body %}
+
+
+<h1>NAVBAR</h1>
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .block {
+        background-color: #ffff;
+        width: 1000px;
+        height: 800px;
+        padding: 30px;
+        margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
+        border-radius: 10px;
+        display: inline-block;
+      }
+
+    .information-item-block {
+        background-color: #ddd;
+        width: 290px;
+        height: 500px;
+        padding: 20px;
+        margin-left: 700px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+</style>
+
+
+
+<!-- Buttons touch item-->
+<form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="button_reviews" value="item_information">
+    <input type="submit" value="Відгуки">
+    
+</form>
+
+
+
+<div class="block">
+    <div class="information-item-block">
+        <h1>{{ name_items }}</h1>
+        <hr>
+   
+        {% for x in items_info %}   
+            <h1>{{ x.price }} ₴</h1>
+            <hr>
+            <h1>{{ x.description_items }}</h1>
+
+
+        {% endfor %}  
+
+    </div>
+</div>
+
+
+{% endblock %}

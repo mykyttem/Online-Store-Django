@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ name_items }}  
+{% endblock %}
+
+
+{% block body %}
+
+<h1>NAVBAR</h1>
+<style>
+
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .block {
+        background-color: #ffff;
+        width: 1000px;
+        height: 800px;
+        padding: 30px;
+        margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    .information-item-block {
+        background-color: #ddd;
+        width: 290px;
+        height: 600px;
+        padding: 20px;
+        margin-left: 700px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+
+    .block-reviews {
+        background-color: #f2f2f2;
+        margin: 20px 20px 20px; 
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+    }
+    
+    .block-reviews h2 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    
+    .block-reviews h3 {
+        font-size: 18px;
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+    
+    .block-reviews ul {
+        list-style-type: disc;
+        margin-left: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .block-reviews li {
+        margin-bottom: 5px;
+    }
+  
+</style>
+
+
+
+
+<div class="block">
+    <div class="information-item-block">
+        <h1>{{ name_items }}</h1>
+        <hr>
+
+        {% for x in items_info %}   
+            <h1>{{ x.price }} ₴</h1>
+            <hr>
+            <h1>{{ x.description_items }}</h1>
+        {% endfor %}  
+
+        <hr>
+        <h1>Залишите відгук</h1>
+
+        {% for x in items_info %}   
+            <form action="/items/{{ x.id }}/{{ x.name_items }}/reviews" method="POST">
+                {% csrf_token %}
+                <!-- Get id this item -->
+                <input type="hidden" name="id_item_review" value="{{ x.id }}">
+                
+
+                <h4>Ведіть  опис відгука</h4>
+                <input type="text" name="text_review" placeholder="Введіть як вам товар" />
+
+                <h4>Ведіть переваги товару</h4>
+                <input type="text" name="advantages_item" placeholder="Введіть переваги товару..." />
+                <h4>Ведіть недоліки товару</h4>
+                <br>
+                <input type="text" name="disadvantages_item" placeholder="Введіть недоліки товару..." />
+                <br>
+                <br>
+                <button type="submit">Добавити</button>
+            </form>
+            
+            <!-- Expect error -->
+            {% for msg in messages %}
+            <h1>Щоб залишити відгук, треба увійти в акаунт</h1> 
+            {% endfor %}
+            
+
+        {% endfor %}  
+
+
+    </div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+{% for x in see_reviews_this_item %}
+    <div class="block-reviews">
+        <h2>{{ x.login_user_review }}</h2>
+        <p>{{ x.date_reviews }}</p>
+        <hr>
+        <p>{{ x.text_review }}</p>
+        <h3>Переваги</h3>
+
+        <ul>
+          <p>{{ x.advantages_item }}</p>
+        </ul>
+
+        <h3>Не доліки</h3>
+
+        <ul>
+          <p>{{ x.disadvantages_item }}</p>
+        </ul>
+
+    </div>
+{% endfor %}
+
+
+{% endblock %}
