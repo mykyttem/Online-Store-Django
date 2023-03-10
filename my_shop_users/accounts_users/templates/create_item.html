@@ -12,11 +12,11 @@ Create item
     {% csrf_token %}
     
     <label for="posting">Назва товару</label>
-    <input type="text" name="name_item" placeholder="Введіть назву товару..." />    
+    <input type="text" name="name_item" placeholder="Введіть назву товару..." required/>    
 
     <div class="form-group">        
         <br>
-        <label for="posting">Текст посту</label>
+        <label for="posting">Опис товару</label>
         <textarea class="form-control" name="description_item" id="posting" cols="60" rows="6" required></textarea>
         
     </div>
@@ -24,19 +24,19 @@ Create item
 
     
     <label for="posting">Категорія товару</label>
-    <input type="text" name="category_item" placeholder="Введіть категорію товару..." />    
+    <input type="text" name="category_items" placeholder="Введіть категорію товару..." required/>    
 
     <br>
     <br>
 
     <label for="posting">Ваш телефон, щоб клієнти могли зв'язатися з вами</label>
-    <input type="text" name="phone_user" placeholder="Введіть ваш номер телефону..." />    
+    <input type="text" name="phone_user" placeholder="Введіть ваш номер телефону..." required/>    
 
     <br>
     <br>
 
     <label for="posting">Ціна товара</label>
-    <input type="text" name="price_item" placeholder="Введіть ціну товару..." />  
+    <input type="text" name="price_item" placeholder="Введіть ціну товару..." required/>  
 
     <br>
     <br>

@@ -4,45 +4,37 @@
 {{ name_items }}
 {% endblock %}
 
+<!-- connect css file for this html -->
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'item_information.css'%}">
+{% endblock %}
+
 
 {% block body %}
 
 
-<h1>NAVBAR</h1>
-<style>
-    body {
-        background-color: #f5f5f5;
-    }
-
-    .block {
-        background-color: #ffff;
-        width: 1000px;
-        height: 800px;
-        padding: 30px;
-        margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
-        border-radius: 10px;
-        display: inline-block;
-      }
-
-    .information-item-block {
-        background-color: #ddd;
-        width: 290px;
-        height: 500px;
-        padding: 20px;
-        margin-left: 700px;
-        border-radius: 10px;
-        display: inline-block;
-    }
-</style>
-
-
 
 <!-- Buttons touch item-->
+
+<!-- Button review for item -->
 <form method="POST">
     {% csrf_token %}
     <input type="hidden" name="button_reviews" value="item_information">
     <input type="submit" value="Відгуки">
-    
+    <span style="font-weight: bold;">{{count_reviews_item}}</span>
+</form>
+
+
+
+<br>
+
+<!-- Button question for item -->
+<form method="POST">
+    {% csrf_token %}    
+    <input type="hidden" name="button_questions" value="item_information">
+    <input type="submit" value="Питання">
+    <span style="font-weight: bold;">{{count_questions_item}}</span>
 </form>
 
 

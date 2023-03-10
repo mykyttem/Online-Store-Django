@@ -11,7 +11,7 @@ Edit item
     {% csrf_token %}
     
     <label for="posting">Назва товару</label>
-    <input type="text" name="name_item_edit" value="{{ name_items_get_edit }}" placeholder="Введіть назву товару..." />    
+    <input type="text" name="name_item_edit" value="{{ name_items_get_edit }}" placeholder="Введіть назву товару..." required/>    
 
 
     <div class="form-group">        
@@ -23,19 +23,19 @@ Edit item
     <br>
 
     <label for="posting">Категорія товару</label>
-    <input type="text" name="category_items_edit" value="{{ category_get_items_edit }}" placeholder="Введіть категорію товару..." />    
+    <input type="text" name="category_items_edit" value="{{ category_get_items_edit }}" placeholder="Введіть категорію товару..." required/>    
 
     <br>
     <br>
 
     <label for="posting">Ваш телефон, щоб клієнти могли зв'язатися з вами</label>
-    <input type="text" name="phone_user_edit" value="{{ phone_get_edit }}" placeholder="Введіть ваш номер телефону..." />    
+    <input type="text" name="phone_user_edit" value="{{ phone_get_edit }}" placeholder="Введіть ваш номер телефону..." required/>    
 
     <br>
     <br>
 
     <label for="posting">Ціна товара</label>
-    <input type="text" name="price_item_edit" value="{{ price_get_edit }}" placeholder="Введіть ціну товару..." />  
+    <input type="text" name="price_item_edit" value="{{ price_get_edit }}" placeholder="Введіть ціну товару..." required/>  
 
     <br>
     <br>

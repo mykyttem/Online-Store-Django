@@ -102,7 +102,6 @@ def my_profile(request):
     logout_profile = request.POST.get('logout_profile')
     delete_item = request.POST.get('delete_item') 
 
-
     # global variabes for edit item
     global item_id
 
@@ -147,7 +146,8 @@ def my_profile(request):
                 item_id_get.delete()
                 
             return redirect('my_profile')
-        
+
+
         
         if edit_item:
        

@@ -4,39 +4,16 @@
 My profile
 {% endblock %}
 
+<!-- connect css file for this html -->
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'my_profile.css'%}">
+{% endblock %}
+
+
+
 
 {% block body %}
-     <style>
-        body {
-            background-color: #f5f5f5;
-        }
-
-		.profile {
-			border: 2px solid black;
-			padding: 10px;
-			margin: 20px 0;
-			width: 200px;
-			height: 700px;
-			float: left;
-			border-radius: 5px;
-			background-color: #f2f2f2;
-            position: fixed;
-         
-		}
-
-        .block {
-            background-color: #ffff;
-            width: 200px;
-            height: 200px;
-            padding: 20px;
-            margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
-            border-radius: 10px;
-            display: inline-block;
-          }
-
-
-	</style>
-
 
 <div class="profile" >
     <h1>Profile</h1>
@@ -61,7 +38,7 @@ My profile
 {% for x in myitems %}      
     <div class="block">
         <ul>
-            <!-- Edit button  -->
+            <!-- Edit - button  -->
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="item_id" value="{{ x.id }}">
@@ -71,17 +48,17 @@ My profile
                 <input type="hidden" name="phone" value="{{ x.phone }}">
                 <input type="hidden" name="price" value="{{ x.price }}">
                 
-                
-                
-
+        
                 <input type="submit" value="Edit item">
-                
             </form>
         
             
             <br>
 
-            <!-- Delete button  -->
+            <br>
+
+
+            <!-- Delete - button  -->
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="item_id" value="{{ x.id }}">
