@@ -33,8 +33,5 @@ class Items_Questions(models.Model):
     id_user_Questions = models.IntegerField(null=True)
     id_item_Questions = models.IntegerField(null=True)
     count_useful_Questions = models.IntegerField(default=0)
-
-
     date_Questions = models.DateField(null=True)
-
     text_Questions = models.CharField(max_length=255)

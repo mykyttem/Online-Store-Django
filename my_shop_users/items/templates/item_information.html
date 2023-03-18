@@ -7,11 +7,15 @@
 <!-- connect css file for this html -->
 {% block link %}
     {% load static %}
-    <link rel="stylesheet" href="{% static 'item_information.css'%}">
+    <link rel="stylesheet" href="{% static 'css/item_information.css'%}">
 {% endblock %}
 
 
 {% block body %}
+<br>
+<br>
+<br>
+
 
 
 
@@ -43,17 +47,18 @@
     <div class="information-item-block">
         <h1>{{ name_items }}</h1>
         <hr>
-   
-        {% for x in items_info %}   
-            <h1>{{ x.price }} ₴</h1>
-            <hr>
-            <h1>{{ x.description_items }}</h1>
 
+        <h1>{{ items_info_price }} ₴</h1>
+        <hr>
+        <h1>{{ items_info_description }}</h1>
 
-        {% endfor %}  
+     
 
     </div>
 </div>
+
+
+
 
 
 {% endblock %}

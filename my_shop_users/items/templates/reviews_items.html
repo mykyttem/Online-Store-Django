@@ -9,7 +9,7 @@
 <!-- connect css file for this html -->
 {% block link %}
     {% load static %}
-    <link rel="stylesheet" href="{% static 'reviews_items.css'%}">
+    <link rel="stylesheet" href="{% static 'css/reviews_items.css'%}">
 {% endblock %}
 
 
@@ -233,6 +233,7 @@
 <!-- See reviews other users -->
 {% for review in see_reviews_this_item %}
     {% if not show_my_review|length or review.id != show_my_review.0.id %}
+    
         <div class="block-reviews">
             <h2>{{ review.login_user_review }}</h2>
             <p>{{ review.date_reviews }}</p>
@@ -249,9 +250,6 @@
             <ul>
               <p>{{ review.disadvantages_item }}</p>
             </ul>
-
-    
-
 
     
         </div>

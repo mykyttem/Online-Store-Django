@@ -1,0 +1,67 @@
+.block_sort_cheap {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block; /* додати це */
+    cursor: pointer; /* додайте цей рядок для зміни курсора на пальцевий */
+}
+
+.block_sort_expencive {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block; /* додати це */
+    cursor: pointer; /* додайте цей рядок для зміни курсора на пальцевий */
+}
+
+
+.block_newItem {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block; /* додати це */
+    cursor: pointer; /* додайте цей рядок для зміни курсора на пальцевий */
+}
+
+.block_more_review {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block; /* додати це */
+    cursor: pointer; /* додайте цей рядок для зміни курсора на пальцевий */
+}
+
+
+
+.block_search_item {
+    display: block;
+}
+
+
+.main_block_sort_chp_to_exp {
+    display: none;
+}
+
+.main_block_sort_exp_to_chp {
+    display: none;
+}
+
+.main_block_newItem {
+    display: none;
+}
+
+.main_block_more_review {
+    display: none;
+}

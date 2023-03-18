@@ -7,14 +7,17 @@ All items
 <!-- connect css file for this html -->
 {% block link %}
     {% load static %}
-    <link rel="stylesheet" href="{% static 'all_items.css'%}">
+    <link rel="stylesheet" href="{% static 'css/all_items.css'%}">
 {% endblock %}
 
 
 
 {% block body %}
 
-    
+
+
+
+
 {% for x in myitems %}      
     <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
         

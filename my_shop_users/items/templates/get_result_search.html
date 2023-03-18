@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ item_get_name }}
+{% endblock %}
+
+<!-- connect css file for this html -->
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/all_items.css'%}">
+    <link rel="stylesheet" href="{% static 'css/get_result_search.css'%}">
+{% endblock %}
+
+
+{% block body %}
+<script defer src="{% static 'js/get_result_search.js' %}"></script>
+
+
+<!-- Sorting -->
+<h2 style="text-align: right;">Сортування</h2>
+<div style="text-align: right">
+
+    <!-- від дешевого до дорого -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="sort_cheap_to_expensive" value="cheap_to_expencive">
+        <input type="submit" style="float: right;" id="cheap_sort_btn" onclick="showOrhideChptoExp();" value="Від дешевих до дорогих">
+    </form>
+
+    <br>
+    <br>
+
+    <!-- Від дорогих до дешевого -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="sort_expensive_to_cheap" value="sort_expensive_to_cheap">
+        <input type="submit" style="float: right;" id="exp_sort_btn" onclick="showExp_or_Chp()" value="Від дорогих до дешевих"?>
+    </form>
+
+    <br>
+    <br>
+
+    <!-- New items -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="newItem" value="newItem">
+        <input type="submit" style="float: right;" id="newItem" onclick="newItem()" value="Новинки"?>
+    </form>
+
+    <br>
+    <br>
+
+    <!-- More review -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="more_review" value="more_review">
+        <input type="submit" style="float: right;" id="more_review" onclick="moreReview()" value="По відгукам"?>
+    </form>
+
+</div>
+
+
+<!-- sort reviews -->
+<div class="main_block_more_review">
+    {% for item_review in reviews_result %}
+        <div class="block_more_review" onclick="window.location.href='/items/{{ item_review.id }}/{{ item_review.name_items }}'">
+            <ul>
+                <h1>PHOTO</h1>
+                <h4> {{ item_review.name_items }} </h4>
+                <h4> {{ item_review.price }} </h4>
+            </ul>
+        </div>
+    {% endfor %}
+</div>
+
+
+
+<!-- sort new item -->
+<div class="main_block_newItem">
+    {% for new_item in new_ones_first %}
+        <div class="block_newItem" onclick="window.location.href='/items/{{ new_item.id }}/{{ new_item.name_items }}'">
+            <ul>
+                <h1>PHOTO</h1>
+                <h4> {{ new_item.name_items }} </h4>
+                <h4> {{ new_item.price }} </h4>
+            </ul>
+        </div>
+    {% endfor %}
+</div>
+
+
+<!-- sort від дешевого до дорогих -->
+<div class="main_block_sort_chp_to_exp">
+    {% for item_sort_сheap in items_cheap_to_expencive%}
+
+        <div class="block_sort_cheap" onclick="window.location.href='/items/{{ item_sort_сheap.id }}/{{ item_sort_сheap.name_items }}'">
+            <ul>
+                <h1>PHOTO</h1>
+                <h4> {{ item_sort_сheap.name_items }} </h4>
+                <h4> {{ item_sort_сheap.price }} </h4>
+            </ul>
+            
+        </div>
+    {% endfor %}
+</div>
+
+
+<!-- sort від дорого до дешевих -->
+<div class="main_block_sort_exp_to_chp">
+    {% for item_sort_expencive in items_expencive_to_cheap %}
+
+        <div class="block_sort_expencive" onclick="window.location.href='/items/{{ item_sort_сheap.id }}/{{ item_sort_сheap.name_items }}'">
+            <ul>
+                <h1>PHOTO</h1>
+                <h4> {{ item_sort_expencive.name_items }} </h4>
+                <h4> {{ item_sort_expencive.price }} </h4>
+            </ul>
+            
+        </div>
+    {% endfor %}
+</div>
+
+
+
+
+
+<!-- result item -->
+<div class="block_search_item">
+    {% for item in all_items_search %}
+
+        <div class="block" id='all_item_search' onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
+            <ul>
+                <h1>PHOTO</h1>
+                <h4> {{ item.name_items }} </h4>
+                <h4> {{ item.price }} </h4>
+            </ul>        
+        </div>
+        
+    {% endfor %}
+</div>
+
+
+{% endblock %}  
