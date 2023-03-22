@@ -41,6 +41,57 @@
       nav ul li a:hover {
         background-color: #555;
       }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+      }
+      
+      .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+      
+      .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      
+
+        
+      .block_shopping_cart {
+          background-color: #fff;
+          width: 150px;
+          height: 140px;
+          padding: 20px;
+          margin: 20px;
+          border-radius: 10px;
+          display: inline-block; /* додати це */
+          cursor: pointer; /* додайте цей рядок для зміни курсора на пальцевий */
+      }
+      
+      
+      
+      
   </style>
 
     <nav>
@@ -52,13 +103,45 @@
         
           <form action="/items/" method="POST">
             {% csrf_token %}
-
             <input type="text" name="search_item_field" placeholder="Що ви шукаєте?"/>    
             <button type="submit">Знайти</button>
           </form>
-      
         </ul>
     </nav>
+
+
+    <button id="button_shopping_cart">Корзина</button>
+
+    <div id="modal_shopping_cart" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+          <div class="block_shopping_cart" onclick="window.location.href='/items/{{ id }}/{{ name_item }}'">
+            {% block shoping_cart %}{%endblock%}
+          </div>
+      </div>
+    </div>
+    
+
+    <script>
+      const modal = document.getElementById("modal_shopping_cart");
+      const button = document.getElementById("button_shopping_cart");
+      const span = document.getElementsByClassName("close")[0];
+      
+      button.onclick = function() {
+        modal.style.display = "block";
+      }
+      
+      span.onclick = function() {
+        modal.style.display = "none";
+      }
+      
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    </script>
+
 
     <br>
     <br>

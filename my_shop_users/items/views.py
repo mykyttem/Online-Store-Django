@@ -9,6 +9,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from .models import Items, Items_Reviews, Items_Questions
 
 from datetime import datetime 
+import json
 
 
 def items(request):
@@ -82,10 +83,18 @@ def item_search(request, result_item_name):
 
 
 def item_information(request, id, item_name):
+    """Інформації о товарі, можно переглянути відгуки, та питання до товару, та ще прописана трохи кода для NavBar(Корзина)"""
+    #TODO: поставити шифр/захист на cookie 
+    #TODO: Змінити кнопки котрі 'POST' на 'GET' тоді можно буде прибрати "{crsf_token}"
+
+
     button_reviews = request.POST.get('button_reviews') 
     button_questions = request.POST.get('button_questions')
+    button_shoping_basket = request.POST.get('btn_shoping_basket')
+
+    btn_delete_bussket_item = request.GET.get('btn_delete_bussket_item')
+
     
-   
     # count "reviews" and "questions"
     count_reviews_item = Items_Reviews.objects.filter(id_item_review=id).count() 
     count_questions_item = Items_Questions.objects.filter(id_item_Questions=id).count()
@@ -96,13 +105,40 @@ def item_information(request, id, item_name):
     items_info_price = items_info.price 
     items_info_description = items_info.description_items   
 
-
     # checking for availability
     search_items = Items.objects.filter(name_items=item_name, id=id)
 
+    # get cookies
+    get_item_bussket = request.COOKIES.get('all_item_bussket')
+    items_bussket_dict = ''
+
+    if get_item_bussket is not None:
+        items_bussket_dict = json.loads(get_item_bussket) 
+
+    if items_bussket_dict == '':
+        items_bussket_dict = {"items_bussket": []}
+
+
+    json_data = items_bussket_dict['items_bussket']
+    value_keys = [] 
+    
+
+    for i in json_data:
+        # added value keys, in list, and buttons in HTML 
+        value_keys.extend(i.values())
+        value_keys.append(f"""
+                <form method="GET">
+                    <input type="hidden" name="btn_delete_bussket_item" value="{i['id_item']}">
+                    <input type="submit" value="Видалити з корзини">
+                </form>
+        """) 
+        # value_keys.append("<button>Оформити замовлення</button>")   
+        value_keys.append("<hr>")
+
+
     if not search_items:
         return render(request, 'error_pages/not_found_item.html', {'not_found_item': search_items})    
-    else:
+    else:        
         context = {
             # info for item
             'name_items': item_name,
@@ -111,23 +147,61 @@ def item_information(request, id, item_name):
             
             # count 
             'count_reviews_item': count_reviews_item,
-            'count_questions_item': count_questions_item
+            'count_questions_item': count_questions_item,
+
+            # cookie 
+            'value_keys': value_keys
         }
 
+        
         if request.method == 'POST':
             if button_reviews:
                 return redirect(f'/items/{id}/{item_name}/reviews')
-            
+                        
             if button_questions:
                 return redirect(f'/items/{id}/{item_name}/questions')
             
+            if button_shoping_basket:
+                responce = redirect('.')
+
+                #TODO: прибрати id для очей користувача (але щоб залишався обовзяково для backend)
+                items_bussket_dict["items_bussket"].append(
+                    {"name_items": item_name,
+                    "price": items_info_price,
+                    "items_info_description": items_info_description,
+                    "id_item": id}
+                )
+                responce.set_cookie('all_item_bussket', json.dumps(items_bussket_dict))    
+
+                return responce
             
+
+        if request.method == 'GET':
+            if btn_delete_bussket_item: # get button and id_item
+                responce = redirect('.') 
+
+                new_list = [dictonary for dictonary in json_data
+                            if dictonary['id_item'] != int(btn_delete_bussket_item)]
+
+
+                new_list_dict = {
+                    "items_bussket": new_list   
+                }
+
+
+                responce.set_cookie('all_item_bussket', json.dumps(new_list_dict))     
+
+
+                return responce
+
+        
         return render(request, 'item_information.html', context)
-    
+        
+
 
 # function reviews for item
 def reviews_items(request, id, item_name):
-    items_info = Items.objects.filter(id=id, name_items=item_name).values() # отримати всю інформацію про елемент, якщо співпадають дані 
+    items_info = Items.objects.filter(id=id, name_items=item_name).values() # get all info for element, якщо співпадають дані 
 
 
     # get session user - id, login
