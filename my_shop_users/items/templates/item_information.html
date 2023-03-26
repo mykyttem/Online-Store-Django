@@ -26,8 +26,8 @@
 
 <div class="shoping_cart">
         {% block shoping_cart %}
-            {% for i in value_keys %}  
-                <h2>{{  i|safe  }} </h2>
+            {% for i in value_keys %}
+                <h2>{{  i|safe  }}</h2>
             {% endfor %}
         {% endblock %}
 </div>
@@ -35,8 +35,7 @@
 
 <!-- Buttons touch item-->
 <!-- Button review for item -->
-<form method="POST">
-    {% csrf_token %}
+<form method="GET">
     <input type="hidden" name="button_reviews" value="item_information">
     <input type="submit" value="Відгуки">
     <span style="font-weight: bold;">{{count_reviews_item}}</span>
@@ -45,8 +44,7 @@
 <br>
 
 <!-- Button question for item -->
-<form method="POST">
-    {% csrf_token %}    
+<form method="GET">   
     <input type="hidden" name="button_questions" value="item_information">
     <input type="submit" value="Питання">
     <span style="font-weight: bold;">{{count_questions_item}}</span>
@@ -64,8 +62,7 @@
         <h1>{{ items_info_description }}</h1>
 
         <!-- Button shoping basket -->
-        <form method="POST">
-            {% csrf_token %}    
+        <form method="GET">   
             <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
             <input type="submit" value="Додати в кошик">
         </form>
