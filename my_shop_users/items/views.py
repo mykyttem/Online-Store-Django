@@ -15,7 +15,7 @@ import json
 def items(request):
     myitems = Items.objects.all().values()
     
-    
+    global search_item_field
     search_item_field = ""
     if request.method == 'POST':
         search_item_field = request.POST.get('search_item_field', "")  
@@ -31,12 +31,14 @@ def items(request):
     context = {
         'myitems': myitems # all items
     }
+
     return render(request, 'all_items.html', context)
 
 
-#TODO: зробити в ячейках кнопки
-#FIXME: Не завджи зявляється елементи про пошуку, тільки після натискання на кнопку
-
+#TODO: зробити кнопку очистити фільтри
+#TODO: зробити ліміт на блоків в одну сторінку, щоб було наприклад: items/page1 or items/page2
+#TODO: добавити інші фільтри
+#FIXME: не завжди зявляється при пошуку
 def item_search(request, result_item_name):
     """ 
     На сторінці пошуку, зявляються результат пошуку, кнопки, сортуваня, фільтри.
@@ -44,16 +46,24 @@ def item_search(request, result_item_name):
     all_items_search = Items.objects.filter(name_items__icontains=result_item_name).values()
 
     # fix bug, local variable    
-    items_cheap_to_expencive, items_expencive_to_cheap, new_ones_first, reviews_result = [], [], [], []
+    items_cheap_to_expencive, items_expencive_to_cheap, new_ones_first, reviews_result, filter_price = [], [], [], [], []
 
 
-    # Sort button item
     if request.method == 'POST':
+        # filters price
+        first_price = request.POST['first_price']
+        last_price = request.POST['last_price']
+
+        # apply price filter
+        filter_price = Items.objects.filter(name_items__icontains=result_item_name, price__gte=first_price, price__lte=last_price).values()
+        
+
+    if request.method == 'GET':
         # buttons - від дешевих до дорогих, від дорого до дешевого, New items, Reviews
-        sort_cheap_to_expensive = request.POST.get('sort_cheap_to_expensive', "") 
-        sort_expensive_tp_cheap = request.POST.get('sort_expensive_to_cheap', "") 
-        new_item = request.POST.get('newItem', "") 
-        more_review = request.POST.get('more_review', "")
+        sort_cheap_to_expensive = request.GET.get('sort_cheap_to_expensive', "") 
+        sort_expensive_tp_cheap = request.GET.get('sort_expensive_to_cheap', "") 
+        new_item = request.GET.get('newItem', "") 
+        more_review = request.GET.get('more_review', "")
         
 
         if sort_cheap_to_expensive: 
@@ -70,35 +80,38 @@ def item_search(request, result_item_name):
     
     context_result_search = {
         'all_items_search': all_items_search,
+        'search_item_field': search_item_field,
 
         # sorting
         'items_cheap_to_expencive': items_cheap_to_expencive,
         'items_expencive_to_cheap': items_expencive_to_cheap,
         'new_ones_first': new_ones_first,
-        'reviews_result': reviews_result
+        'reviews_result': reviews_result,
+
+        # filters
+        'filter_price': filter_price
     }
 
 
     return render(request, 'get_result_search.html', context_result_search)
 
-
+#TODO: коли кошик пустий, добавити надпись "кошик пустий"
+#TODO: поставити шифр/захист на cookie 
+#FIXME: добавити перенаправлення на товар в корзині
+#FIXME: дивитися що в корзині можно тільки там де на стоірцні товару
 def item_information(request, id, item_name):
     """Інформації о товарі, можно переглянути відгуки, та питання до товару, та ще прописана трохи кода для NavBar(Корзина)"""
-    #TODO: поставити шифр/захист на cookie 
-    #TODO: Змінити кнопки котрі 'POST' на 'GET' тоді можно буде прибрати "{crsf_token}"
 
-
-    button_reviews = request.POST.get('button_reviews') 
-    button_questions = request.POST.get('button_questions')
-    button_shoping_basket = request.POST.get('btn_shoping_basket')
-
+    button_reviews = request.GET.get('button_reviews') 
+    button_questions = request.GET.get('button_questions')
+    button_shoping_basket = request.GET.get('btn_shoping_basket')
     btn_delete_bussket_item = request.GET.get('btn_delete_bussket_item')
 
     
     # count "reviews" and "questions"
     count_reviews_item = Items_Reviews.objects.filter(id_item_review=id).count() 
     count_questions_item = Items_Questions.objects.filter(id_item_Questions=id).count()
-
+ 
 
     # Get All Info for item, якщо співпадають дані
     items_info = Items.objects.get(id=id, name_items=item_name) 
@@ -115,17 +128,18 @@ def item_information(request, id, item_name):
     if get_item_bussket is not None:
         items_bussket_dict = json.loads(get_item_bussket) 
 
+
     if items_bussket_dict == '':
         items_bussket_dict = {"items_bussket": []}
 
 
     json_data = items_bussket_dict['items_bussket']
     value_keys = [] 
+ 
     
-
     for i in json_data:
         # added value keys, in list, and buttons in HTML 
-        value_keys.extend(i.values())
+        value_keys.append(i['name_items']), value_keys.append(i['price']),  value_keys.append(i['items_info_description'])
         value_keys.append(f"""
                 <form method="GET">
                     <input type="hidden" name="btn_delete_bussket_item" value="{i['id_item']}">
@@ -134,6 +148,7 @@ def item_information(request, id, item_name):
         """) 
         # value_keys.append("<button>Оформити замовлення</button>")   
         value_keys.append("<hr>")
+        
 
 
     if not search_items:
@@ -154,7 +169,7 @@ def item_information(request, id, item_name):
         }
 
         
-        if request.method == 'POST':
+        if request.method == 'GET':
             if button_reviews:
                 return redirect(f'/items/{id}/{item_name}/reviews')
                         
@@ -164,7 +179,6 @@ def item_information(request, id, item_name):
             if button_shoping_basket:
                 responce = redirect('.')
 
-                #TODO: прибрати id для очей користувача (але щоб залишався обовзяково для backend)
                 items_bussket_dict["items_bussket"].append(
                     {"name_items": item_name,
                     "price": items_info_price,
@@ -197,7 +211,6 @@ def item_information(request, id, item_name):
         
         return render(request, 'item_information.html', context)
         
-
 
 # function reviews for item
 def reviews_items(request, id, item_name):

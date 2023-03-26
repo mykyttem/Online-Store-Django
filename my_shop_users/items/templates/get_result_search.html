@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-{{ item_get_name }}
+    {{ search_item_field }}
 {% endblock %}
 
 <!-- connect css file for this html -->
@@ -15,44 +15,57 @@
 {% block body %}
 <script defer src="{% static 'js/get_result_search.js' %}"></script>
 
+<style>    
+    .left_block_filters {
+        float: left;
+        width: 20%;
+        height: 400px;
+        background-color: #ffffff;
+    }
+</style>
+
+<div class="left_block_filters">
+    <h1>Фільтри</h1>
+    <button onclick="reset_filter();">Очистити фільтри</button>
+    <h2>Ціна</h2>
+
+    <h4>від</h4>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="number" name="first_price" style="width: 20%;" value="0">
+        <h4>До</h4>
+        <input type="number" name="last_price" style="width: 20%;" value="0">
+        <button type="submit" onclick="filter_price();">Ок</button>
+    </form>
+    <hr>
+</div>
 
 <!-- Sorting -->
-<h2 style="text-align: right;">Сортування</h2>
-<div style="text-align: right">
+<h3 style="text-align: right;">Сортування</h3>
+<div style="text-align: right;">
 
     <!-- від дешевого до дорого -->
-    <form method="POST">
-        {% csrf_token %}
+    <form method="GET" style="display: inline-block;"> 
         <input type="hidden" name="sort_cheap_to_expensive" value="cheap_to_expencive">
-        <input type="submit" style="float: right;" id="cheap_sort_btn" onclick="showOrhideChptoExp();" value="Від дешевих до дорогих">
+        <input type="submit" style="float: right; " id="cheap_sort_btn" onclick="showOrhideChptoExp();" value="Від дешевих до дорогих">
     </form>
 
-    <br>
-    <br>
-
+  
     <!-- Від дорогих до дешевого -->
-    <form method="POST">
-        {% csrf_token %}
+    <form method="GET" style="display: inline-block;">
         <input type="hidden" name="sort_expensive_to_cheap" value="sort_expensive_to_cheap">
         <input type="submit" style="float: right;" id="exp_sort_btn" onclick="showExp_or_Chp()" value="Від дорогих до дешевих"?>
     </form>
 
-    <br>
-    <br>
-
+  
     <!-- New items -->
-    <form method="POST">
-        {% csrf_token %}
+    <form method="GET" style="display: inline-block;">
         <input type="hidden" name="newItem" value="newItem">
         <input type="submit" style="float: right;" id="newItem" onclick="newItem()" value="Новинки"?>
     </form>
 
-    <br>
-    <br>
-
     <!-- More review -->
-    <form method="POST">
-        {% csrf_token %}
+    <form method="GET" style="display: inline-block;">
         <input type="hidden" name="more_review" value="more_review">
         <input type="submit" style="float: right;" id="more_review" onclick="moreReview()" value="По відгукам"?>
     </form>
@@ -121,13 +134,24 @@
 </div>
 
 
+<!-- Filter price -->
+<div class="main_block_filter_price">
+    {% for price in filter_price %}
+        <div class="filter_price" onclick="window.location.href='/items/{{ price.id }}/{{ price.name_items }}'">
+            <ul>
+                <h1>PHOTO</h1>
+                <h4> {{ price.name_items }} </h4>
+                <h4> {{ price.price }} </h4>
+            </ul>
+        </div>
+    {% endfor %}
+</div>
 
 
 
 <!-- result item -->
 <div class="block_search_item">
     {% for item in all_items_search %}
-
         <div class="block" id='all_item_search' onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
             <ul>
                 <h1>PHOTO</h1>
@@ -135,7 +159,6 @@
                 <h4> {{ item.price }} </h4>
             </ul>        
         </div>
-        
     {% endfor %}
 </div>
 

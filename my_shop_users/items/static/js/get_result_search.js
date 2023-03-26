@@ -6,6 +6,7 @@ const div_exp_to_chp = document.querySelector('.main_block_sort_exp_to_chp')
 const div_newItem = document.querySelector('.main_block_newItem')
 const div_review = document.querySelector('.main_block_more_review')
 
+const div_filter_price = document.querySelector('.main_block_filter_price')
 
 let isCliked = localStorage.getItem('isClicked') === 'true';
 
@@ -91,3 +92,26 @@ if(isCliked){
 } else {
     div_search.style.display = 'block';
 }
+
+
+// filter price
+let filter_price = function(){
+    if(isCliked){
+        div_search.style.display = 'none';
+        div_filter_price.style.display = 'block'
+        isCliked = false;
+    } else {
+        div_search.style.display = 'block';
+        isCliked = true;            
+    }
+    localStorage.setItem('isClicked', isCliked);
+}
+
+if(isCliked){
+    div_search.style.display = 'none';
+    div_filter_price.style.display = 'block'
+} else {
+    div_search.style.display = 'block';
+}
+
+
