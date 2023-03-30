@@ -1,169 +1,85 @@
-
-body {
-    background-color: #f5f5f5;
-}
-
-/* block-other-users-Questions */
-.block {
+.block_sort_cheap {
     background-color: #ffff;
-    width: 1000px;
-    height: 800px;
-    padding: 30px;
-    margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
-    border-radius: 10px;
-    display: inline-block;
-}
-
-.information-item-block {
-    background-color: #ddd;
-    width: 290px;
-    height: 600px;
+    width: 150px;
+    height: 140px;
     padding: 20px;
-    margin-left: 700px;
-    border-radius: 10px;
-    display: inline-block;
-}
-
-
-.block-Questionss {
-    background-color: #f2f2f2;
-    margin: 20px 20px 20px; 
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
-}
-
-.block-Questionss h2 {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.block-Questionss h3 {
-    font-size: 18px;
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
-
-.block-Questionss ul {
-    list-style-type: disc;
-    margin-left: 20px;
-    margin-bottom: 20px;
-}
-
-.block-Questionss li {
-    margin-bottom: 5px;
-}
-
-/* block-my-Questions */
-.block-my-Questions {
-    background-color: #f2f2f2;
     margin: 20px;
-    padding: 20px;
     border-radius: 10px;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
-    border: 2px solid #00ff00;
-    box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5);
-  }
-  
-
-.block-my-Questions h2 {
-    font-size: 24px;
-    margin-bottom: 5px;
+    display: inline-block; 
+    cursor: pointer; /* зміни курсора на пальцевий */
 }
 
-.block-my-Questions h3 {
-    font-size: 18px;
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
-
-.block-my-Questions ul {
-    list-style-type: disc;
-    margin-left: 20px;
-    margin-bottom: 20px;
-}
-
-.block-my-Questions li {
-    margin-bottom: 5px;
-}
-
-
-
-/* block-my-Questions */
-.My_Reply {
-    background-color: #f2f2f2;
-    margin: 40px 40px 40px; 
+.block_sort_expencive {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
     padding: 20px;
-    border-radius: 20px;
-    box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5);
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
-    border: 2px solid #00ff00;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block; 
+    cursor: pointer; /*зміни курсора на пальцевий */
+}
 
-  }
-  
 
-.Replys_Question {
-    background-color: #f2f2f2;
-    margin: 40px 40px 40px; 
+.block_newItem {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
     padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block; 
+    cursor: pointer; /* зміни курсора на пальцевий */
 }
 
-.Replys_Question h2 {
-    font-size: 24px;
-    margin-bottom: 5px;
+
+.block_more_review {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    cursor: pointer; /* зміни курсора на пальцевий */
 }
 
-.Replys_Question h3 {
-    font-size: 18px;
-    margin-top: 20px;
-    margin-bottom: 5px;
+.filter_price {
+    background-color: #ffff;
+    width: 150px;
+    height: 140px;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    cursor: pointer; /* зміни курсора на пальцевий */
 }
 
-.Replys_Question ul {
-    list-style-type: disc;
-    margin-left: 20px;
-    margin-bottom: 20px;
+
+
+
+.block_search_item {
+    display: block;
 }
 
-.Replys_Question li {
-    margin-bottom: 5px;
+
+.main_block_sort_chp_to_exp {
+    display: none;
 }
 
-  
-
-.Replys_Question h2 {
-    font-size: 24px;
-    margin-bottom: 5px;
+.main_block_sort_exp_to_chp {
+    display: none;
 }
 
-.Replys_Question h3 {
-    font-size: 18px;
-    margin-top: 20px;
-    margin-bottom: 5px;
+.main_block_newItem {
+    display: none;
 }
 
-.Replys_Question ul {
-    list-style-type: disc;
-    margin-left: 20px;
-    margin-bottom: 20px;
+.main_block_more_review {
+    display: none;
 }
 
-.Replys_Question li {
-    margin-bottom: 5px;
+
+.main_block_filter_price {
+    display: none;
 }
