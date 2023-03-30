@@ -6,7 +6,7 @@ from django.contrib import messages
 
 from django.utils.datastructures import MultiValueDictKeyError
 
-from .models import Items, Items_Reviews, Items_Questions
+from .models import Items, Items_Reviews, Items_Questions, Items_Questions_Replys
 
 from datetime import datetime 
 import json
@@ -213,9 +213,11 @@ def item_information(request, id, item_name):
         
 
 # function reviews for item
+#TODO: покращити reviews_items код як в питаннях
 def reviews_items(request, id, item_name):
-    items_info = Items.objects.filter(id=id, name_items=item_name).values() # get all info for element, якщо співпадають дані 
-
+    # get all info for element, якщо співпадають дані 
+    items_info = Items.objects.filter(id=id, name_items=item_name).values()
+    
 
     # get session user - id, login
     login_user_review = request.session.get('login')
@@ -288,10 +290,10 @@ def reviews_items(request, id, item_name):
     see_reviews_this_item = Items_Reviews.objects.filter(id_item_review=id).values() 
 
 
+
     # checking for availability
     search_items = Items.objects.filter(name_items=item_name, id=id)
     
-
     # show my reviews
     show_my_review = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id).values() 
 
@@ -312,95 +314,119 @@ def reviews_items(request, id, item_name):
 
 # function questions for item
 def questions_items(request, id, item_name):
-
-    items_info = Items.objects.filter(id=id, name_items=item_name).values() # отримати всю інформацію про елемент, якщо співпадають дані 
-
+    items_info = Items.objects.filter(id=id, name_items=item_name).values() # get all info for element, якщо співпадають дані 
 
     # get session user - id, login
     login_user_Questions = request.session.get('login')
-    id_user_Questions = request.session.get('id')   
+    id_user_Questions = request.session.get('id')  
+     
+
+    # get the item id under which the comment was left
+    id_item_Questions = request.POST.get('id_item_Questions')
+ 
+    # button Delete, and edit my Questions
+    delete_my_Questions = request.POST.get('delete_my_Questions')
 
 
-    # I could not find a better way to solve the bug when clicking the button
-    try:
-        if request.method == 'POST':
-            text_Questions = request.POST['text_Questions']
+    if 'text_Questions' in request.POST:
+        text_Questions = request.POST['text_Questions']
 
 
-            # get the item id under which the comment was left
-            id_item_Questions = request.POST.get('id_item_Questions')
+        if not login_user_Questions:
+            messages.success(request, "Щоб залишит відгук, треба увійти в аккунт")
+            return redirect(f'/items/{id}/{item_name}/questions')
+        else:
+            # check dublicae Questions person
+            check_Questions_person = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id) # "check id_user_Questions" and "id_item_Questions_id"
+            if not check_Questions_person:
+                date_Questions = datetime.now()
 
-
-            try:
-                # check dublicae Questions person
-                check_Questions_person = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id) # "check id_user_Questions" and "id_item_Questions_id"
-                if not check_Questions_person:
-
-                    # date added Questions
-                    date_Questions = datetime.now()
-
-                    new_Questions = Items_Questions(login_user_Questions=login_user_Questions, id_user_Questions=id_user_Questions, date_Questions=date_Questions, text_Questions=text_Questions, id_item_Questions=id_item_Questions)
-                    new_Questions.save()
-                    
-
-                    return redirect(f'/items/{id}/{item_name}/questions')
+                new_Questions = Items_Questions(login_user_Questions=login_user_Questions, id_user_Questions=id_user_Questions, date_Questions=date_Questions, text_Questions=text_Questions, id_item_Questions=id_item_Questions)
+                new_Questions.save()
                 
-                else:
-                    return HttpResponse('Вже все оставляли своє питання на цьому товарі')
-                
-            except IntegrityError:
-                messages.success(request, "Щоб залишит відгук, треба увійти в аккунт")
                 return redirect(f'/items/{id}/{item_name}/questions')
-            
-            
-    except MultiValueDictKeyError:
-        # fields edit questions
+            else:
+                return HttpResponse('Вже все оставляли своє питання на цьому товарі')
+               
+
+    find_my_Questions_this_item = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id) # "check id_user_Questions" and "id_item_Qustions_id"
+
+    # activate button - delete my Questions
+    if delete_my_Questions:
+        # find my Questions
+        find_my_Questions_this_item.delete()
+        
+
+    if 'text_Questions_edit' in request.POST:
         text_Questions_edit = request.POST['text_Questions_edit']
 
-
-        # button Delete, and edit my Questions
-        delete_my_Questions = request.POST.get('delete_my_Questions')
-
-
-
-        # activate button - delete my Questions
-        if delete_my_Questions:
-            # find my Questions
-            find_my_Questions_this_item = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id) # "check id_user_Questions" and "id_item_Qustions_id"
-            find_my_Questions_this_item.delete()
-
-
         # edit my Questions
-        if request.method == 'POST':
-            get_my_Questions = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id).first() # "check id_user_Question" and "id_item_review_Questio"
+        get_my_Questions = find_my_Questions_this_item.first() # "check id_user_Question" and "id_item_review_Questio"
+        if get_my_Questions:
+            get_my_Questions.text_Questions = text_Questions_edit
+            get_my_Questions.save() 
 
-            if get_my_Questions:
-                get_my_Questions.text_Questions = text_Questions_edit
+        
+
+    delete_my_reply = request.GET.get('delete_my_reply')
+    if 'reply_id_quest' in request.POST:        
+        reply_text = request.POST.get('reply_text')
+        reply_id_quest = request.POST['reply_id_quest']
 
 
-                get_my_Questions.save()   
-                
-            
-    # show Questions, only of this item
-    see_Questions_this_item = Items_Questions.objects.filter(id_item_Questions=id).values() 
+        # reply 
+        date_reply = datetime.now()
+
+        save_reply = Items_Questions_Replys(login_user_Questions_reply=login_user_Questions, id_user_Questions_reply=id_user_Questions, id_item_Questions_reply=reply_id_quest, date_Questions_reply=date_reply, text_Questions_reply=reply_text)
+        save_reply.save()
+        return redirect('./questions')
+    
+
+    my_id_reply = delete_my_reply
+    find_my_reply = Items_Questions_Replys.objects.filter(id_user_Questions_reply=id_user_Questions, id=my_id_reply)
+    if delete_my_reply:
+        find_my_reply.delete()
+
+
+    
+    if 'reply_text_edit' in request.POST:
+        reply_id_quest_edit = request.POST.get('reply_id_quest_edit')
+        reply_text_edit = request.POST['reply_text_edit']
+        
+        get_my_reply = Items_Questions_Replys.objects.filter(id_user_Questions_reply=id_user_Questions, id=reply_id_quest_edit).first()
+        
+        get_my_reply.text_Questions_reply = reply_text_edit
+        get_my_reply.save(update_fields=['text_Questions_reply']) 
+
+        
+
+    # show my Questions, and other Questions, only of this item
+    see_Questionss_this_item = Items_Questions.objects.filter(id_item_Questions=id).values() 
+    show_my_Questions = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id).values() 
+
+
+    # Show reply
+    see_reply_this_item = Items_Questions_Replys.objects.values()
+    see_my_reply = Items_Questions_Replys.objects.filter(id_user_Questions_reply=id_user_Questions).values
 
 
     # checking for availability
     search_items = Items.objects.filter(name_items=item_name, id=id)
     
 
-    # show my Questions
-    show_my_Questions = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id).values() 
-
-    
     if not search_items:
         return HttpResponse('НЕМАЄ ТАКОГО ТОВАРУ')
     else:
         context = {
             'name_items': item_name,
             'items_info': items_info,
-            'see_Questions_this_item': see_Questions_this_item,
-            'show_my_Questions': show_my_Questions
+            'id_user_Questions': id_user_Questions,
+
+            'see_Questionss_this_item': see_Questionss_this_item,
+            'show_my_Questions': show_my_Questions,
+
+            'see_reply_this_item': see_reply_this_item,
+            'see_my_reply': see_my_reply    
         }   
 
 
