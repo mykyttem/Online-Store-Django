@@ -213,9 +213,7 @@ def item_information(request, id, item_name):
         
 
 # function reviews for item
-#TODO: покращити reviews_items код як в питаннях
 def reviews_items(request, id, item_name):
-    # get all info for element, якщо співпадають дані 
     items_info = Items.objects.filter(id=id, name_items=item_name).values()
     
 
@@ -223,73 +221,61 @@ def reviews_items(request, id, item_name):
     login_user_review = request.session.get('login')
     id_user_review = request.session.get('id')   
 
-
-    # I could not find a better way to solve the bug when clicking the button
-    try:
-        if request.method == 'POST':
-            text_review = request.POST['text_review']
-            advantages_item = request.POST['advantages_item']
-            disadvantages_item = request.POST['disadvantages_item']
+    # get the item id under which the comment was left
+    id_item_review = request.POST.get('id_item_review')
+    delete_my_review = request.POST.get('delete_my_review')
 
 
-            # get the item id under which the comment was left
-            id_item_review = request.POST.get('id_item_review')
+    if 'text_review' in request.POST:
+        text_review = request.POST['text_review']
+        advantages_item = request.POST['advantages_item']
+        disadvantages_item = request.POST['disadvantages_item']
 
 
-            try:
-                # check dublicae review person
-                check_review_person = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id) # "check id_user_review" and "id_item_review_id"
-                if not check_review_person:
-                    # date added reiview
-                    date_reviews = datetime.now()
+        if not login_user_review:
+            messages.success(request, "Щоб залишит відгук, треба увійти в аккунт")
+            return redirect(f'/items/{id}/{item_name}/reviews')
+        else:
+            # check dublicae review person
+            check_review_person = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id) # "check id_user_review" and "id_item_review_id"
+            if not check_review_person:
+                # date added reiview
+                date_reviews = datetime.now()
 
-                    new_review = Items_Reviews(login_user_review=login_user_review, id_user_review=id_user_review, date_reviews=date_reviews, text_review=text_review, advantages_item=advantages_item, disadvantages_item=disadvantages_item, id_item_review=id_item_review)
-                    new_review.save()
-                    
-
-                    return redirect(f'/items/{id}/{item_name}/reviews')
+                new_review = Items_Reviews(login_user_review=login_user_review, id_user_review=id_user_review, date_reviews=date_reviews, text_review=text_review, advantages_item=advantages_item, disadvantages_item=disadvantages_item, id_item_review=id_item_review)
+                new_review.save()
                 
-                else:
-                    return HttpResponse('Вже все оставляли свій відгук на цьому товарі')
-                
-            except IntegrityError:
-                messages.success(request, "Щоб залишит відгук, треба увійти в аккунт")
                 return redirect(f'/items/{id}/{item_name}/reviews')
+            else:
+                return HttpResponse('Вже все оставляли свій відгук на цьому товарі')
             
-            
+    # find my review
+    find_my_review_this_item = Items_Reviews.objects.filter(id_user_review=id_user_review,  id_item_review=id) # "check id_user_review" and "id_item_review_id"
 
-    except MultiValueDictKeyError:
+    # activate button - delete my review
+    if delete_my_review:
+        find_my_review_this_item.delete()
+
+
+    if 'text_review_edit' in request.POST:
         # fields edit, advantages, disadvantages, delete
         text_review_edit = request.POST['text_review_edit']
         advantages_item_edit = request.POST['advantages_item_edit']
         disadvantages_item_edit = request.POST['disadvantages_item_edit']
-        delete_my_review = request.POST.get('delete_my_review')
 
+        # edit my review   
+        get_my_review = find_my_review_this_item.first() # "check id_user_review" and "id_item_review_id"
 
-        # activate button - delete my review
-        if delete_my_review:
-            # find my review
+        if get_my_review:
+            get_my_review.text_review = text_review_edit
+            get_my_review.advantages_item = advantages_item_edit
+            get_my_review.disadvantages_item = disadvantages_item_edit
 
-            find_my_review_this_item = Items_Reviews.objects.filter(id_user_review=id_user_review,  id_item_review=id) # "check id_user_review" and "id_item_review_id"
-            find_my_review_this_item.delete()
-
-
-        # edit my review
-        if request.method == 'POST':
-            get_my_review = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id).first() # "check id_user_review" and "id_item_review_id"
-
-            if get_my_review:
-                get_my_review.text_review = text_review_edit
-                get_my_review.advantages_item = advantages_item_edit
-                get_my_review.disadvantages_item = disadvantages_item_edit
-
-                get_my_review.save()   
+            get_my_review.save()   
                 
 
     # show reviews, only of this item
     see_reviews_this_item = Items_Reviews.objects.filter(id_item_review=id).values() 
-
-
 
     # checking for availability
     search_items = Items.objects.filter(name_items=item_name, id=id)
@@ -308,7 +294,6 @@ def reviews_items(request, id, item_name):
             'show_my_review': show_my_review
         }   
 
-        
     return render(request, 'reviews_items.html', context)
 
 
