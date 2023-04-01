@@ -115,8 +115,17 @@
     <div id="modal_shopping_cart" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
-          <div class="block_shopping_cart" onclick="window.location.href='/items/{{ id }}/{{ name_item }}'">
-            {% block shoping_cart %}{%endblock%}
+            <div class="shoping_cart">    
+                 
+                {% if not save_value_keys %}
+                    <h1>Кошик порожній</h1>
+                {% else %}
+                    {% for i in save_value_keys %}
+                        <h2>{{  i|safe  }}</h2>
+                    {% endfor %}
+                {% endif %}
+    
+            </div>
           </div>
       </div>
     </div>

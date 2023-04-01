@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block title %}
 {{ name_items }}
 {% endblock %}
@@ -15,22 +16,6 @@
 <br>
 <br>
 <br>
-
-<!-- div "shoping_cart" see only in base - shoping cart -->
-<style>
-    .shoping_cart {
-        display: none;
-    }
-</style>
-
-
-<div class="shoping_cart">
-        {% block shoping_cart %}
-            {% for i in value_keys %}
-                <h2>{{  i|safe  }}</h2>
-            {% endfor %}
-        {% endblock %}
-</div>
 
 
 <!-- Buttons touch item-->
@@ -61,11 +46,16 @@
         <hr>
         <h1>{{ items_info_description }}</h1>
 
-        <!-- Button shoping basket -->
-        <form method="GET">   
-            <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
-            <input type="submit" value="Додати в кошик">
-        </form>
+        {% if not checking_item_in_bussket %}
+            <!-- Button shoping basket -->
+            <form method="GET">   
+                <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
+                <input type="submit" value="Додати в кошик">
+            </form>
+        {% else %}
+            <hr>
+            <h1>Товар добавлен в кошик ✔</h1>
+        {% endif %}
 
     </div>
 </div>

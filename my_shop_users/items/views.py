@@ -38,7 +38,7 @@ def items(request):
 #TODO: зробити кнопку очистити фільтри
 #TODO: зробити ліміт на блоків в одну сторінку, щоб було наприклад: items/page1 or items/page2
 #TODO: добавити інші фільтри
-#FIXME: не завжди зявляється при пошуку
+#FIXME: не завжди зявляється при пошуку(більше повязано з кнопками)
 def item_search(request, result_item_name):
     """ 
     На сторінці пошуку, зявляються результат пошуку, кнопки, сортуваня, фільтри.
@@ -95,24 +95,25 @@ def item_search(request, result_item_name):
 
     return render(request, 'get_result_search.html', context_result_search)
 
-#TODO: коли кошик пустий, добавити надпись "кошик пустий"
+
 #TODO: поставити шифр/захист на cookie 
-#FIXME: добавити перенаправлення на товар в корзині
-#FIXME: дивитися що в корзині можно тільки там де на стоірцні товару
+#TODO: зробити, скільки потрібно замовити товару (наприклад: playstation 1, 2, 3) - і ціна змінюється
+
+#FIXME: видаляти з корзини можно тільки на сторінці товару
 def item_information(request, id, item_name):
-    """Інформації о товарі, можно переглянути відгуки, та питання до товару, та ще прописана трохи кода для NavBar(Корзина)"""
+    """Інформації о товарі, можно переглянути відгуки, та питання до товару, добавити в коризну"""
+    responce = redirect('.')
 
     button_reviews = request.GET.get('button_reviews') 
     button_questions = request.GET.get('button_questions')
     button_shoping_basket = request.GET.get('btn_shoping_basket')
+    
     btn_delete_bussket_item = request.GET.get('btn_delete_bussket_item')
 
-    
     # count "reviews" and "questions"
     count_reviews_item = Items_Reviews.objects.filter(id_item_review=id).count() 
     count_questions_item = Items_Questions.objects.filter(id_item_Questions=id).count()
  
-
     # Get All Info for item, якщо співпадають дані
     items_info = Items.objects.get(id=id, name_items=item_name) 
     items_info_price = items_info.price 
@@ -121,7 +122,7 @@ def item_information(request, id, item_name):
     # checking for availability
     search_items = Items.objects.filter(name_items=item_name, id=id)
 
-    # get cookies
+    #  get cookies
     get_item_bussket = request.COOKIES.get('all_item_bussket')
     items_bussket_dict = ''
 
@@ -134,23 +135,11 @@ def item_information(request, id, item_name):
 
 
     json_data = items_bussket_dict['items_bussket']
-    value_keys = [] 
- 
+
+    checking_item_in_bussket = [dictonary for dictonary in json_data
+                    if dictonary['id_item'] == id]
     
-    for i in json_data:
-        # added value keys, in list, and buttons in HTML 
-        value_keys.append(i['name_items']), value_keys.append(i['price']),  value_keys.append(i['items_info_description'])
-        value_keys.append(f"""
-                <form method="GET">
-                    <input type="hidden" name="btn_delete_bussket_item" value="{i['id_item']}">
-                    <input type="submit" value="Видалити з корзини">
-                </form>
-        """) 
-        # value_keys.append("<button>Оформити замовлення</button>")   
-        value_keys.append("<hr>")
-        
-
-
+    
     if not search_items:
         return render(request, 'error_pages/not_found_item.html', {'not_found_item': search_items})    
     else:        
@@ -164,8 +153,7 @@ def item_information(request, id, item_name):
             'count_reviews_item': count_reviews_item,
             'count_questions_item': count_questions_item,
 
-            # cookie 
-            'value_keys': value_keys
+            'checking_item_in_bussket': checking_item_in_bussket
         }
 
         
@@ -177,8 +165,6 @@ def item_information(request, id, item_name):
                 return redirect(f'/items/{id}/{item_name}/questions')
             
             if button_shoping_basket:
-                responce = redirect('.')
-
                 items_bussket_dict["items_bussket"].append(
                     {"name_items": item_name,
                     "price": items_info_price,
@@ -188,34 +174,31 @@ def item_information(request, id, item_name):
                 responce.set_cookie('all_item_bussket', json.dumps(items_bussket_dict))    
 
                 return responce
-            
-
-        if request.method == 'GET':
-            if btn_delete_bussket_item: # get button and id_item
-                responce = redirect('.') 
-
-                new_list = [dictonary for dictonary in json_data
-                            if dictonary['id_item'] != int(btn_delete_bussket_item)]
 
 
-                new_list_dict = {
-                    "items_bussket": new_list   
-                }
+            #FIXME ПРАЦЮЄ тільки на сторінці товару    
+            # if btn_delete_bussket_item: # get button and id_item
+            #     new_list = [dictonary for dictonary in json_data
+            #                 if dictonary['id_item'] != int(btn_delete_bussket_item)]
+
+            #     new_list_dict = {
+            #         "items_bussket": new_list   
+            #     }
+
+            #     responce.set_cookie('all_item_bussket', json.dumps(new_list_dict))     
 
 
-                responce.set_cookie('all_item_bussket', json.dumps(new_list_dict))     
-
-
-                return responce
+            #     return responce
 
         
         return render(request, 'item_information.html', context)
+
+    
         
 
 # function reviews for item
 def reviews_items(request, id, item_name):
     items_info = Items.objects.filter(id=id, name_items=item_name).values()
-    
 
     # get session user - id, login
     login_user_review = request.session.get('login')
@@ -224,7 +207,6 @@ def reviews_items(request, id, item_name):
     # get the item id under which the comment was left
     id_item_review = request.POST.get('id_item_review')
     delete_my_review = request.POST.get('delete_my_review')
-
 
     if 'text_review' in request.POST:
         text_review = request.POST['text_review']
@@ -282,7 +264,6 @@ def reviews_items(request, id, item_name):
     
     # show my reviews
     show_my_review = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id).values() 
-
 
     if not search_items:
         return HttpResponse('НЕМАЄ ТАКОГО ТОВАРУ')
