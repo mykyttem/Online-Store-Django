@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Оформити замовлення
+{% endblock %}
+
+
+{% block body %}
+<h1>Оформлення замовлення</h1>
+<h2>Вкажть контакнту інформацію</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="number" name="your_number" placeholder="Ваш теелефон">
+    <input type="text" name="your_name" placeholder="Ім'я">
+    <input type="text" name="your_surname" placeholder="Прізвище">
+    <input type="email" name="your_email" placeholder="email">
+    
+    <br>
+    <br>
+
+    <h1>Заказ №</h1>
+    <h2>Тут будуть товари, котрі хочуть придбати</h2>
+    <h2>Загальна сума товарів</h2>
+
+    <hr>
+        <h2>Тут буде заказ</h2>
+    <hr>
+
+    <h1>Доставка</h1>
+        <h2>Тут буде способи доставки</h2>
+    <hr>
+
+    <h1>Оплата</h1>
+        <input type="checkbox" name="payment_upon_receipt"><h3>Оплата при отримані</h3>
+        <input type="checkbox" name="online_payment"><h3>Онлайн</h3>
+    <hr>
+
+    <h1>Отримувач</h1>
+        <input type="checkbox" name="I_receiver"><h3>Я</h3>
+        <input type="checkbox" name="other_person"><h3>Інша людина</h3>
+        <input type="checkbox" name="do_not_call_me_back"><h3>Мені не передзванювати</h3>
+
+    <button type="submit">Підтвердити замовлення</button>
+
+</form>
+
+{% endblock %}

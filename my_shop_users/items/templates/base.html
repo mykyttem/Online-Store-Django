@@ -121,9 +121,16 @@
                     <h1>Кошик порожній</h1>
                 {% else %}
                     {% for i in save_value_keys %}
-                        <h2>{{  i|safe  }}</h2>
+                        <h2>{{  i|safe  }}</h2>                      
                     {% endfor %}
                 {% endif %}
+
+                <form method="GET" action="/checkout">
+                  <input type="hidden" name="order_item" value="{i['id_item']}">
+                  <button type="submit">Оформити замовлення</button>
+                </form>
+
+                
     
             </div>
           </div>
