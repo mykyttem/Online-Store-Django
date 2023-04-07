@@ -1,22 +1,19 @@
 from django.shortcuts import render, redirect
-from django.template import loader
 
 from .models import Registration
 from items.models import Items
+from client_service.models import Order_Items
 
 from django.http import HttpResponse
-from django.db.models import Q
 
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-from django.contrib.auth import authenticate, login
 
 from datetime import datetime 
 
 
 #TODO: ЗРОБИТИ iD ІЗ БІЛЬШЕ ЧИСЛ
 #TODO: добавити більше даних для користувача
-
 
 # Create your views here.
 def accounts_users(request):
@@ -28,15 +25,13 @@ def accounts_users(request):
         # hashed password
         hashed_password = make_password(password_user)
 
-
         # search email-dublicate user, from DB
         search_email_dublicate = Registration.objects.filter(
-        Q(email_user = f'{email_user}'))
+        email_user = email_user)
 
         # search login-dublicate user, from DB
         search_login_dublicate = Registration.objects.filter(
-        Q(login_user = f'{login_user}'))
-
+        login_user = login_user)
 
 
         if len(login_user) < 3:
@@ -48,28 +43,22 @@ def accounts_users(request):
             new_account.save()
             return redirect('sign_in')
 
-            
-        
 
     return render(request, 'registration.html', {})
-
 
 
 def sign_in(request):
     if request.method == 'POST':
         login_user = request.POST['login']
-        email_user = request.POST['email']
         password_user = request.POST['password']
 
         # search login user, from DB
-        search_login = Registration.objects.filter(
-        Q(login_user = f'{login_user}'))
+        search_login = Registration.objects.filter(login_user = login_user)
 
 
         if not search_login:
             messages.success(request, "Not found account/not correct password")
             return redirect('sign_in')
-        
         else:
             # get user from DB
             user = Registration.objects.get(login_user=login_user)
@@ -86,10 +75,7 @@ def sign_in(request):
                 return redirect('sign_in')
 
 
-
     return render(request, 'sign_in.html', {})
-
-
 
 
 def my_profile(request):
@@ -124,7 +110,7 @@ def my_profile(request):
     if login_user == None:
         return HttpResponse('Ви забули увійти в аккаунт')
     
-    myitems = Items.objects.filter(Q(author_id_item=f'{id_user}')).values # витягуєм тільки ті товари, які стоврив користувач
+    myitems = Items.objects.filter(author_id_item=id_user).values # витягуєм тільки ті товари, які стоврив користувач
  
     context = {
         'login_user': login_user,
@@ -141,28 +127,16 @@ def my_profile(request):
 
 
         if delete_item:
-            item_id_get = Items.objects.filter(Q(id=item_id)).first() # витягуєм тільки ті товари, які стоврив користувач
+            item_id_get = Items.objects.filter(id=item_id).first() # витягуєм тільки ті товари, які стоврив користувач
             if item_id_get and item_id_get.author_id_item == id_user: # видалити товар той який пренадлежит користувачу
                 item_id_get.delete()
                 
             return redirect('my_profile')
 
 
-        
-        if edit_item:
-       
-            # print(name_items_get_edit)
-            # print(description_get_edit)
-            # print(category_get_items_edit)
-            # print(phone_get_edit)
-            # print(price_get_edit)
-            # print(item_id)
-            
+        if edit_item:            
             return redirect('edit_item')
         
-
-
-
 
     return render(request, 'my_profile.html', context)
 
@@ -190,15 +164,10 @@ def create_item(request):
         return redirect('my_profile')
 
 
-
-
     return render(request, 'create_item.html', {})
 
 
-
 def edit_item(request):
-
-
     context = {
         'name_items_get_edit': name_items_get_edit,
         'description_get_edit': description_get_edit,
@@ -214,14 +183,11 @@ def edit_item(request):
         category_items_edit = request.POST['category_items_edit']
         phone_user_edit = request.POST['phone_user_edit']
         price_item_edit = request.POST['price_item_edit']
-
         id_user = request.session.get('id')
 
         
-        item_id_get = Items.objects.filter(Q(id=item_id)).first() # витягуватой той товар який обрав користувач
+        item_id_get = Items.objects.filter(id=item_id).first() # витягуватой той товар який обрав користувач
         if item_id_get and item_id_get.author_id_item == id_user: # редагувати товар той який обав користувач і пренадлежит користувачу
-
-
             item_id_get.name_items = name_item_edit
             item_id_get.description_items = description_item_edit
             item_id_get.category_items = category_items_edit
@@ -230,13 +196,35 @@ def edit_item(request):
 
             item_id_get.save()
 
- 
 
             return redirect('my_profile')
         
-
         return redirect('my_profile')
 
 
     return render(request, 'edit_item.html', context)
 
+
+def my_orders(request):
+    id_user_session = request.session.get('id')
+    search_my_orders = Order_Items.objects.filter(id_client=id_user_session).values()
+
+    list_id_items = []
+    for id in search_my_orders:
+        id_items = id['item_id']
+        for i in id_items:
+            list_id_items.append(i)
+
+
+    info_item = []
+    for info in list_id_items:
+        get_info_item = Items.objects.filter(id=info).values()
+        info_item.extend(get_info_item)
+        
+
+    context = {
+        'info_item': info_item
+    }
+
+
+    return render(request, 'my_orders.html', context)

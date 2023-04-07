@@ -7,6 +7,7 @@ class Order_Items(models.Model):
     client_name = models.CharField(max_length=30)
     client_username = models.CharField(max_length=30)
     client_email = models.CharField(max_length=30)
+    id_client = models.IntegerField()
 
     # Оплата
     payment_upon_receipt = models.BooleanField(default=False, null=True)
@@ -17,4 +18,5 @@ class Order_Items(models.Model):
     other_person = models.BooleanField(default=False, null=True)
     do_not_call_me_back = models.BooleanField(default=False, null=True)
 
-    author_item_id = models.IntegerField()
+    # Get id, name item
+    item_id = models.JSONField()
