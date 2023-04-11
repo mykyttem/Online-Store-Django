@@ -15,23 +15,40 @@
         background-color: #ffff;
         width: 200px;
         height: 250px;
-        padding: 20px;
-        margin: 20px 20px 20px 220px;
+        padding: 40px;
+        margin: 30px 30px 30px 50px;
         border-radius: 10px;
         display: inline-block;
         cursor: pointer;
       }
 </style>
 
-{% for x in info_item %}      
-    <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
-        <ul>
-            <h1>Items</h1>
-            <h4> {{ x.name_items }} </h4>
-            <h4> {{ x.price }} </h4>
-        </ul>
-    </div>
-{% endfor %}  
+<hr>
 
+
+{% for key, value in show_order_item.items %}
+<li>
+    <strong>Замовлення №</strong>
+    <ul>
+        {% for item in value %}
+        <div class="block" onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
+            
+            <form method="GET">
+                <input type="hidden" name="delete_from_order" value="{{ item.id }}">
+                <input type="submit" value="Видалити товар із списку замовлень">
+            </form>
+
+            
+            <ul>
+                <h1>Items</h1>
+          
+                <h4> {{ item.name_items }} </h4>
+                <h4> {{ item.price }} </h4>
+            </ul>
+        </div>
+        {% endfor %}
+    </ul>
+</li>
+{% endfor %}
 
 {% endblock %}

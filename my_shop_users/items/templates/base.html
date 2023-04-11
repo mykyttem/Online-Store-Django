@@ -85,8 +85,8 @@
           padding: 20px;
           margin: 20px;
           border-radius: 10px;
-          display: inline-block; /* додати це */
-          cursor: pointer; /* додайте цей рядок для зміни курсора на пальцевий */
+          display: inline-block;
+          cursor: pointer; 
       }
       
       
@@ -125,10 +125,12 @@
                     {% endfor %}
                 {% endif %}
 
-                <form method="GET" action="/checkout">
-                  <input type="hidden" name="order_item" value="{i['id_item']}">
-                  <button type="submit">Оформити замовлення</button>
-                </form>
+                {% if save_value_keys %}
+                  <form method="GET" action="/checkout">
+                    <input type="hidden" name="order_item" value="{i['id_item']}">
+                    <button type="submit">Оформити замовлення</button>
+                  </form>
+                {% endif %}
 
                 
     

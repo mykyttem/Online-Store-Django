@@ -12,10 +12,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime 
 
 
-#TODO: ЗРОБИТИ iD ІЗ БІЛЬШЕ ЧИСЛ
 #TODO: добавити більше даних для користувача
-
-# Create your views here.
 def accounts_users(request):
     if request.method == 'POST':
         login_user = request.POST['login']
@@ -187,7 +184,7 @@ def edit_item(request):
 
         
         item_id_get = Items.objects.filter(id=item_id).first() # витягуватой той товар який обрав користувач
-        if item_id_get and item_id_get.author_id_item == id_user: # редагувати товар той який обав користувач і пренадлежит користувачу
+        if item_id_get and item_id_get.author_id_item == id_user: # редагувати товар той який обав користувач і належить користувачу
             item_id_get.name_items = name_item_edit
             item_id_get.description_items = description_item_edit
             item_id_get.category_items = category_items_edit
@@ -207,24 +204,51 @@ def edit_item(request):
 
 def my_orders(request):
     id_user_session = request.session.get('id')
-    search_my_orders = Order_Items.objects.filter(id_client=id_user_session).values()
 
-    list_id_items = []
-    for id in search_my_orders:
+    search_my_orders = Order_Items.objects.filter(id_client=id_user_session)
+
+
+    data_order = {
+        'list_id_items': [],
+        'list_id_order': []
+    }
+
+    
+    # get data from my_order, added in dict
+    for id in search_my_orders.values():
         id_items = id['item_id']
-        for i in id_items:
-            list_id_items.append(i)
-
-
-    info_item = []
-    for info in list_id_items:
-        get_info_item = Items.objects.filter(id=info).values()
-        info_item.extend(get_info_item)
+        id_order = id['id']  
         
+        data_order['list_id_order'].append(id_order)        
+        data_order['list_id_items'].append(id_items) 
+             
+
+    if not data_order['list_id_items']:
+        search_my_orders.delete()
+
+
+    list_id_order = data_order['list_id_order']
+    list_id_items = data_order['list_id_items']
+       
+
+    sort_data = {}
+
+    for i in range(len(list_id_order)):
+        sort_data[str(list_id_order[i])] = list_id_items[i]
+    
+    show_order_item = {}
+
+    for number, item_ids in sort_data.items():  # Отримати ключ та значення (список item_ids) зі словника
+        info_item = Items.objects.filter(id__in=item_ids).values()  # Отримати інформацію за значеннями списку item_ids
+        show_order_item[number] = list(info_item)
+
 
     context = {
-        'info_item': info_item
+        'info_item': info_item,
+        'search_my_orders': search_my_orders.order_by('date_order').values(),
+        'show_order_item': show_order_item
     }
 
 
+            
     return render(request, 'my_orders.html', context)

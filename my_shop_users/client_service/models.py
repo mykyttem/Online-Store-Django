@@ -20,3 +20,5 @@ class Order_Items(models.Model):
 
     # Get id, name item
     item_id = models.JSONField()
+    status_order = models.CharField(max_length=30, default='Очікування')
+    date_order = models.DateTimeField(null=True)
