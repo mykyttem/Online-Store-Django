@@ -205,6 +205,9 @@ def edit_item(request):
 def my_orders(request):
     id_user_session = request.session.get('id')
 
+    delete_from_order = request.GET.get('delete_from_order')
+    get_id_order = request.GET.get('get_id_order')
+
     search_my_orders = Order_Items.objects.filter(id_client=id_user_session)
 
 
@@ -213,7 +216,6 @@ def my_orders(request):
         'list_id_order': []
     }
 
-    
     # get data from my_order, added in dict
     for id in search_my_orders.values():
         id_items = id['item_id']
@@ -223,13 +225,9 @@ def my_orders(request):
         data_order['list_id_items'].append(id_items) 
              
 
-    if not data_order['list_id_items']:
-        search_my_orders.delete()
-
-
     list_id_order = data_order['list_id_order']
     list_id_items = data_order['list_id_items']
-       
+    
 
     sort_data = {}
 
@@ -243,12 +241,35 @@ def my_orders(request):
         show_order_item[number] = list(info_item)
 
 
-    context = {
-        'info_item': info_item,
-        'search_my_orders': search_my_orders.order_by('date_order').values(),
-        'show_order_item': show_order_item
-    }
+    try:
+        context = {
+            'info_item': info_item,
+            'search_my_orders': search_my_orders.order_by('date_order').values(),
+            'show_order_item': show_order_item
+        }
+    except UnboundLocalError:
+        not_order_error = '<h1>У вас немає замовлень</h1>'
+        context = {
+            'not_order_error': not_order_error,
+            'search_my_orders': search_my_orders.order_by('date_order').values(),
+            'show_order_item': show_order_item
+        }
 
+    #TODO: Добавити видалення товару тільки якщо статус замовлення "Очікування"
+    if request.method == 'GET':
+        if delete_from_order: 
+            order_data_get = Order_Items.objects.get(id=get_id_order)
+
+            list_item_id_order = order_data_get.item_id  
+            list_item_id_order.remove(int(delete_from_order))
+        
+            order_data_get.item_id = list_item_id_order
+            order_data_get.save()
+
+            if not order_data_get.item_id:
+                order_data_get.delete()
+
+            return redirect('./my_orders')
 
             
     return render(request, 'my_orders.html', context)
