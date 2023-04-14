@@ -1,15 +1,33 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
     Оформити замовлення
 {% endblock %}
 
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'js/check_marks.js'%}">
+{% endblock %}
+
 
 {% block body %}
+<script defer src="{% static 'js/check_marks.js' %}"></script>
+
+
 <style>
     body {
         background-color: #f5f5f5;
+    }
+
+    .block {
+        background-color: #ffff;
+        width: 150px;
+        height: 140px;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 10px;
+        display: inline-block;
+        cursor: pointer; 
     }
 </style>
 
@@ -18,25 +36,32 @@
 
 <form method="POST">
     {% csrf_token %}
-    <input type="number" name="your_number" placeholder="Ваш теелефон">
-    <input type="text" name="your_name" placeholder="Ім'я">
-    <input type="text" name="your_surname" placeholder="Прізвище">
-    <input type="email" name="your_email" placeholder="email">
+    <input type="number" name="your_number" placeholder="Ваш теелефон" required>
+    <input type="text" name="your_name" placeholder="Ім'я" required>
+    <input type="text" name="your_surname" placeholder="Прізвище" required>
+    <input type="email" name="your_email" placeholder="email" required>
     
     <br>
     <br>
 
     <h1>Заказ №</h1>
 
-    {% if not save_value_keys %}
-        <h1>Щоб оформити замовлення, потрібно спочатку добавити товари в кошик</h1>
-    {% else %}
-        {% for i in save_value_keys %}
-            <h2>{{  i|safe  }}</h2>                      
-        {% endfor %}
-    {% endif %}
-    <h2>Загальна сума товарів</h2>
+    {% for i in json_data%}
+        {% if not json_data%}
+            <h1>Щоб оформити замовлення, потрібно спочатку добавити товари в кошик</h1>
+        {% else %}
 
+            <div class="block" onclick="window.location.href='/items/{{ i.id_item }}/{{ i.name_items }}'">
+                <ul>
+                    <h1>Items</h1>
+                    <h4> {{ i.name_items }} </h4>
+                    <h4> {{ i.price }} </h4>
+                </ul>
+            </div>
+
+        {% endif %}
+    {% endfor %}
+    <h2>Загальна сума товарів</h2>
     
     <hr>
 
@@ -44,18 +69,23 @@
         <h2>Тут буде способи доставки</h2>
     <hr>
 
-    <h1>Оплата</h1>
-        <input type="checkbox" name="payment_upon_receipt"><h3>Оплата при отримані</h3>
-        <input type="checkbox" name="online_payment"><h3>Онлайн</h3>
-    <hr>
+    <input type="checkbox" name="payment_upon_receipt" id="payment_upon_receipt_checkbox">
+    <h3>Оплата при отримані</h3>
+
+    <input type="checkbox" name="online_payment" id="online_payment_checkbox">
+    <h3>Онлайн</h3>
 
     <h1>Отримувач</h1>
-        <input type="checkbox" name="I_receiver"><h3>Я</h3>
-        <input type="checkbox" name="other_person"><h3>Інша людина</h3>
-        <input type="checkbox" name="do_not_call_me_back"><h3>Мені не передзванювати</h3>
+        <input type="checkbox" name="I_receiver" id="i_receiver_checkbox">
+        <h3>Я</h3>
+        
+        <input type="checkbox" name="other_person" id="other_person_checkbox">
+        <h3>Інша людина</h3>
+        
+        <input type="checkbox" name="do_not_call_me_back">
+        <h3>Мені не передзванювати</h3>
 
     <button type="submit">Підтвердити замовлення</button>
-
 </form>
-
+    
 {% endblock %}
