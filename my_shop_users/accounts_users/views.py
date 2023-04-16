@@ -223,18 +223,19 @@ def my_orders(request):
         
         data_order['list_id_order'].append(id_order)        
         data_order['list_id_items'].append(id_items) 
-             
+
 
     list_id_order = data_order['list_id_order']
     list_id_items = data_order['list_id_items']
     
-
     sort_data = {}
 
     for i in range(len(list_id_order)):
         sort_data[str(list_id_order[i])] = list_id_items[i]
-    
+
+
     show_order_item = {}
+
 
     for number, item_ids in sort_data.items():  # Отримати ключ та значення (список item_ids) зі словника
         info_item = Items.objects.filter(id__in=item_ids).values()  # Отримати інформацію за значеннями списку item_ids
@@ -273,3 +274,63 @@ def my_orders(request):
 
             
     return render(request, 'my_orders.html', context)
+
+
+def orders_my_client(request):
+    id_seller = request.session.get('id')
+    all_orders = Order_Items.objects.filter(authors_items__icontains=id_seller).values() 
+
+
+    if 'get_id_order' in request.GET:
+        get_name_client = request.GET.get('get_name_client')
+        get_id_order = request.GET.get('get_id_order')
+
+        return redirect(f'orders_my_client/items-cleint/{get_id_order}/{get_name_client}', get_id_order)        
+        
+
+    context = {
+        'all_orders': all_orders
+    }
+
+
+    return render(request, 'orders_my_client.html', context)
+
+
+def client_items(request, get_name_client, get_id_order):
+    id_seller = request.session.get('id')
+    all_orders = Order_Items.objects.filter(id=get_id_order, authors_items__icontains=id_seller).values() 
+
+    data_order = {
+        'list_id_order': [],
+        'list_id_items': []
+    }
+
+
+    for i in all_orders:    
+        data_order['list_id_order'].append(i['id'])
+        data_order['list_id_items'].append(i['item_id'])
+
+
+    list_id_order = data_order['list_id_order']
+    list_id_items = data_order['list_id_items']                 
+
+    sort_data = {}
+
+    for i in range(len(list_id_order)):
+        sort_data[str(list_id_order[i])] = list_id_items[i]
+
+    show_order_item = {}
+
+
+    for number, item_ids in sort_data.items():  
+        info_item = Items.objects.filter(id__in=item_ids, author_id_item=id_seller).values()  
+        show_order_item[number] = list(info_item)
+
+
+    context_client_items = {
+        'name_client': get_name_client,
+        'show_order_item': show_order_item
+    }
+
+
+    return render(request, 'client_items.html', context_client_items)   

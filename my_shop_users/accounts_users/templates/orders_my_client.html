@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Замовлення моїх клієнтів
+{% endblock %}
+
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/orders_my_client.css'%}">
+{% endblock %}
+
+
+{% block body%}
+<h2>Замовлення моїх клієнтів</h2>
+
+{% for order in all_orders %}
+    <div class="block-order">        
+        <ul>
+            <h1>Замовлення від {{order.client_name}}</h1>
+            <h2>Дані користувача</h2>
+
+            <li><strong>Номер:</strong> {{ order.client_number }}</li>
+            <li><strong>Email:</strong> {{order.client_email}}</li>
+            {% if order.payment_upon_receipt == True %}
+                <li><strong>Оплата:</strong>При отримані</li>
+            {% else %}
+                <li><strong>Оплата:</strong>Онлайн</li>
+            {% endif %}
+
+            <h2>Отримувач: </h2>
+            {% if order.I_receiver == True %}
+                <h2>Я</h2>
+            {% else %}
+                <h2>Інша людина</h2>
+            {% endif %}
+
+            <h2>Дзвінок</h2>
+            {% if order.do_not_call_me_back == True %}
+                <h2>Перездвонити</h2>
+            {% else %}
+                <h2>Не передзванювати</h2>
+            {% endif %}
+
+            <br>
+            <form method="GET">
+                <input type="hidden" name="get_id_order" value="{{ order.id }}"/>
+                <input type="hidden" name="get_name_client" value="{{ order.client_name }}"/>
+
+                <button type="submit">Подивитися замовлені товари</button>
+            </form>
+            
+        </ul>
+    </div>
+{% endfor %}
+
+
+{% endblock %}

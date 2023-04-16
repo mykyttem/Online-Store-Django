@@ -18,7 +18,9 @@ class Order_Items(models.Model):
     other_person = models.BooleanField(default=False, null=True)
     do_not_call_me_back = models.BooleanField(default=False, null=True)
 
-    # Get id, name item
+    # Get id, name item, authors
     item_id = models.JSONField()
+    authors_items = models.JSONField()
+
     status_order = models.CharField(max_length=30, default='Очікування')
     date_order = models.DateTimeField(null=True)

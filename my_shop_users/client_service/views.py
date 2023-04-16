@@ -1,8 +1,6 @@
-"""
-Файл буде відповідати за обслогоування клієнта, наприклад: оформити замовлення, тех-підтримка.
-"""
 from django.shortcuts import render, redirect, HttpResponse
 from .models import Order_Items
+from items.models import Items
 
 import json
 from datetime import datetime
@@ -19,10 +17,16 @@ def checkout(request):
 
     # get id items from cookies
     json_data = items_bussket_dict['items_bussket']
+
     list_id_items = []
+    list_author_items = []
 
     for dictonary in json_data:
         list_id_items.append(dictonary['id_item'])
+        get_author_id_item = Items.objects.filter(id=dictonary['id_item']).values()
+        
+        for id_author in get_author_id_item:
+            list_author_items.append(id_author['author_id_item'])
 
     
     # get item from order
@@ -82,10 +86,12 @@ def checkout(request):
             date_time_now = datetime.now()
 
             save_order = Order_Items(client_number=client_number, client_name=client_name, client_username=client_username, client_email=client_email, 
-                        payment_upon_receipt=payment_upon_receipt, online_payment=online_payment, I_receiver=I_receiver, other_person=other_person, do_not_call_me_back=do_not_call_me_back, item_id=list_id_items, id_client=id_user_session, date_order=date_time_now)
+                        payment_upon_receipt=payment_upon_receipt, online_payment=online_payment, I_receiver=I_receiver, other_person=other_person, 
+                        do_not_call_me_back=do_not_call_me_back, item_id=list_id_items, authors_items=list_author_items, id_client=id_user_session, 
+                        date_order=date_time_now)
             save_order.save()
     
-            # delete items from bussket
+
             response = redirect('./my_orders')
             response.delete_cookie('all_item_bussket')
 

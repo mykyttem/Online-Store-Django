@@ -4,17 +4,13 @@
 My profile
 {% endblock %}
 
-<!-- connect css file for this html -->
 {% block link %}
     {% load static %}
-    <link rel="stylesheet" href="{% static 'my_profile.css'%}">
+    <link rel="stylesheet" href="{% static 'css/my_profile.css'%}">
 {% endblock %}
 
 
-
-
 {% block body %}
-
 <div class="profile" >
     <h1>Profile</h1>
     <hr>
@@ -33,9 +29,10 @@ My profile
     <br>
     <br>
     <a href="/my_orders">Подивитися мої замовлення</a>
+    <br>
+    <a href="/orders_my_client">Замолвення моїх клієнтів</a>
 
 </div>
-
 
 
 {% for x in myitems %}      
@@ -54,12 +51,9 @@ My profile
         
                 <input type="submit" value="Edit item">
             </form>
-        
-            
+    
             <br>
-
             <br>
-
 
             <!-- Delete - button  -->
             <form method="POST">
@@ -75,12 +69,6 @@ My profile
             <h4> {{ x.price }} </h4>
         </ul>
     </div>
-
-    
-
-
 {% endfor %}  
-
-    
 
 {% endblock %}
