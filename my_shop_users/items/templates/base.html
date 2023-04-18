@@ -103,7 +103,7 @@
         
           <form action="/items/" method="POST">
             {% csrf_token %}
-            <input type="text" name="search_item_field" placeholder="Що ви шукаєте?"/>    
+            <input type="text" name="search_item_field" placeholder="Що ви шукаєте?" required/>    
             <button type="submit">Знайти</button>
           </form>
         </ul>
