@@ -92,7 +92,7 @@ def checkout(request):
             save_order.save()
     
 
-            response = redirect('./my_orders')
+            response = redirect('my_orders')
             response.delete_cookie('all_item_bussket')
 
             return response
