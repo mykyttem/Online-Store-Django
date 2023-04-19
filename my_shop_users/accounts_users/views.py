@@ -52,7 +52,6 @@ def sign_in(request):
         # search login user, from DB
         search_login = Registration.objects.filter(login_user = login_user)
 
-
         if not search_login:
             messages.success(request, "Not found account/not correct password")
             return redirect('sign_in')
@@ -140,63 +139,72 @@ def my_profile(request):
 
 
 def create_item(request):
-    if request.method == 'POST':
-        name_item = request.POST['name_item']
-        description_item = request.POST['description_item']
-        category_items = request.POST['category_items']
+    id_user = request.session.get('id')
+    
+    if not id_user:
+        return HttpResponse('Увійдіть в кабінет')
+    else:
+        if request.method == 'POST':
+            name_item = request.POST['name_item']
+            description_item = request.POST['description_item']
+            category_items = request.POST['category_items']
 
 
-        phone_user = request.POST['phone_user']
-        price_item = request.POST['price_item']
+            phone_user = request.POST['phone_user']
+            price_item = request.POST['price_item']
 
-        id_user = request.session.get('id')        
+            id_user = request.session.get('id')        
 
-        # date create item
-        date = datetime.now()
+            # date create item
+            date = datetime.now()
 
-        new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user)
-        new_item.save()
+            new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user)
+            new_item.save()
 
 
-        return redirect('my_profile')
+            return redirect('my_profile')
 
 
     return render(request, 'create_item.html', {})
 
 
 def edit_item(request):
-    context = {
-        'name_items_get_edit': name_items_get_edit,
-        'description_get_edit': description_get_edit,
-        'category_get_items_edit': category_get_items_edit,        
-        'phone_get_edit': phone_get_edit,
-        'price_get_edit': price_get_edit
-    }
-    
-
-    if request.method == 'POST':
-        name_item_edit = request.POST['name_item_edit']
-        description_item_edit = request.POST['description_item_edit']
-        category_items_edit = request.POST['category_items_edit']
-        phone_user_edit = request.POST['phone_user_edit']
-        price_item_edit = request.POST['price_item_edit']
-        id_user = request.session.get('id')
-
+    id_user = request.session.get('id')
+    if not id_user:
+        return HttpResponse('Увійдіть в акаунт')
+    else:
+        context = {
+            'name_items_get_edit': name_items_get_edit,
+            'description_get_edit': description_get_edit,
+            'category_get_items_edit': category_get_items_edit,        
+            'phone_get_edit': phone_get_edit,
+            'price_get_edit': price_get_edit
+        }
         
-        item_id_get = Items.objects.filter(id=item_id).first() # витягуватой той товар який обрав користувач
-        if item_id_get and item_id_get.author_id_item == id_user: # редагувати товар той який обав користувач і належить користувачу
-            item_id_get.name_items = name_item_edit
-            item_id_get.description_items = description_item_edit
-            item_id_get.category_items = category_items_edit
-            item_id_get.phone = phone_user_edit
-            item_id_get.price = price_item_edit
 
-            item_id_get.save()
+        if request.method == 'POST':
+            name_item_edit = request.POST['name_item_edit']
+            description_item_edit = request.POST['description_item_edit']
+            category_items_edit = request.POST['category_items_edit']
+            phone_user_edit = request.POST['phone_user_edit']
+            price_item_edit = request.POST['price_item_edit']
+            id_user = request.session.get('id')
+
+            
+            item_id_get = Items.objects.filter(id=item_id).first() # витягуватой той товар який обрав користувач
+            if item_id_get and item_id_get.author_id_item == id_user: # редагувати товар той який обав користувач і належить користувачу
+                item_id_get.name_items = name_item_edit
+                item_id_get.description_items = description_item_edit
+                item_id_get.category_items = category_items_edit
+                item_id_get.phone = phone_user_edit
+                item_id_get.price = price_item_edit
+
+                item_id_get.save()
 
 
+                return redirect('my_profile')
+            
             return redirect('my_profile')
-        
-        return redirect('my_profile')
 
 
     return render(request, 'edit_item.html', context)
@@ -208,129 +216,136 @@ def my_orders(request):
     delete_from_order = request.GET.get('delete_from_order')
     get_id_order = request.GET.get('get_id_order')
 
-    search_my_orders = Order_Items.objects.filter(id_client=id_user_session)
+    if not id_user_session:
+        return HttpResponse('Увійдіть в кабінет')
+    else:
+        search_my_orders = Order_Items.objects.filter(id_client=id_user_session)
 
-
-    data_order = {
-        'list_id_items': [],
-        'list_id_order': []
-    }
-
-    # get data from my_order, added in dict
-    for id in search_my_orders.values():
-        id_items = id['item_id']
-        id_order = id['id']  
-        
-        data_order['list_id_order'].append(id_order)        
-        data_order['list_id_items'].append(id_items) 
-
-
-    list_id_order = data_order['list_id_order']
-    list_id_items = data_order['list_id_items']
-    
-    sort_data = {}
-
-    for i in range(len(list_id_order)):
-        sort_data[str(list_id_order[i])] = list_id_items[i]
-
-
-    show_order_item = {}
-
-
-    for number, item_ids in sort_data.items():  # Отримати ключ та значення (список item_ids) зі словника
-        info_item = Items.objects.filter(id__in=item_ids).values()  # Отримати інформацію за значеннями списку item_ids
-        show_order_item[number] = list(info_item)
-
-
-    try:
-        context = {
-            'info_item': info_item,
-            'search_my_orders': search_my_orders.order_by('date_order').values(),
-            'show_order_item': show_order_item
-        }
-    except UnboundLocalError:
-        not_order_error = '<h1>У вас немає замовлень</h1>'
-        context = {
-            'not_order_error': not_order_error,
-            'search_my_orders': search_my_orders.order_by('date_order').values(),
-            'show_order_item': show_order_item
+        data_order = {
+            'list_id_items': [],
+            'list_id_order': []
         }
 
-    #TODO: Добавити видалення товару тільки якщо статус замовлення "Очікування"
-    if request.method == 'GET':
-        if delete_from_order: 
-            order_data_get = Order_Items.objects.get(id=get_id_order)
-
-            list_item_id_order = order_data_get.item_id  
-            list_item_id_order.remove(int(delete_from_order))
-        
-            order_data_get.item_id = list_item_id_order
-            order_data_get.save()
-
-            if not order_data_get.item_id:
-                order_data_get.delete()
-
-            return redirect('./my_orders')
-
+        # get data from my_order, added in dict
+        for id in search_my_orders.values():
+            id_items = id['item_id']
+            id_order = id['id']  
             
+            data_order['list_id_order'].append(id_order)        
+            data_order['list_id_items'].append(id_items) 
+
+
+        list_id_order = data_order['list_id_order']
+        list_id_items = data_order['list_id_items']
+        
+        sort_data = {}
+
+        for i in range(len(list_id_order)):
+            sort_data[str(list_id_order[i])] = list_id_items[i]
+
+
+        show_order_item = {}
+
+
+        for number, item_ids in sort_data.items():  # Отримати ключ та значення (список item_ids) зі словника
+            info_item = Items.objects.filter(id__in=item_ids).values()  # Отримати інформацію за значеннями списку item_ids
+            show_order_item[number] = list(info_item)
+
+
+        try:
+            context = {
+                'info_item': info_item,
+                'search_my_orders': search_my_orders.order_by('date_order').values(),
+                'show_order_item': show_order_item
+            }
+        except UnboundLocalError:
+            not_order_error = '<h1>У вас немає замовлень</h1>'
+            context = {
+                'not_order_error': not_order_error,
+                'search_my_orders': search_my_orders.order_by('date_order').values(),
+                'show_order_item': show_order_item
+            }
+
+        #TODO: Добавити видалення товару тільки якщо статус замовлення "Очікування"
+        if request.method == 'GET':
+            if delete_from_order: 
+                order_data_get = Order_Items.objects.get(id=get_id_order)
+
+                list_item_id_order = order_data_get.item_id  
+                list_item_id_order.remove(int(delete_from_order))
+            
+                order_data_get.item_id = list_item_id_order
+                order_data_get.save()
+
+                if not order_data_get.item_id:
+                    order_data_get.delete()
+
+                return redirect('./my_orders')
+
+                
     return render(request, 'my_orders.html', context)
 
 
 def orders_my_client(request):
     id_seller = request.session.get('id')
-    all_orders = Order_Items.objects.filter(authors_items__icontains=id_seller).values() 
+    if not id_seller:
+        return HttpResponse('Увійдіть в кабінет')
+    else:
+        all_orders = Order_Items.objects.filter(authors_items__icontains=id_seller).values() 
+        if 'get_id_order' in request.GET:
+            get_name_client = request.GET.get('get_name_client')
+            get_id_order = request.GET.get('get_id_order')
+
+            return redirect(f'./items-cleint/{get_id_order}/{get_name_client}', get_id_order)        
+           
+            
+        context = {
+            'all_orders': all_orders
+        }
 
 
-    if 'get_id_order' in request.GET:
-        get_name_client = request.GET.get('get_name_client')
-        get_id_order = request.GET.get('get_id_order')
-
-        return redirect(f'orders_my_client/items-cleint/{get_id_order}/{get_name_client}', get_id_order)        
-        
-
-    context = {
-        'all_orders': all_orders
-    }
-
-
-    return render(request, 'orders_my_client.html', context)
+        return render(request, 'orders_my_client.html', context)
 
 
 def client_items(request, get_name_client, get_id_order):
     id_seller = request.session.get('id')
-    all_orders = Order_Items.objects.filter(id=get_id_order, authors_items__icontains=id_seller).values() 
 
-    data_order = {
-        'list_id_order': [],
-        'list_id_items': []
-    }
+    if not id_seller:
+        return HttpResponse('Увійдіть в кабінет')
+    else:
+        all_orders = Order_Items.objects.filter(id=get_id_order, authors_items__icontains=id_seller).values() 
 
-
-    for i in all_orders:    
-        data_order['list_id_order'].append(i['id'])
-        data_order['list_id_items'].append(i['item_id'])
-
-
-    list_id_order = data_order['list_id_order']
-    list_id_items = data_order['list_id_items']                 
-
-    sort_data = {}
-
-    for i in range(len(list_id_order)):
-        sort_data[str(list_id_order[i])] = list_id_items[i]
-
-    show_order_item = {}
+        data_order = {
+            'list_id_order': [],
+            'list_id_items': []
+        }
 
 
-    for number, item_ids in sort_data.items():  
-        info_item = Items.objects.filter(id__in=item_ids, author_id_item=id_seller).values()  
-        show_order_item[number] = list(info_item)
+        for i in all_orders:    
+            data_order['list_id_order'].append(i['id'])
+            data_order['list_id_items'].append(i['item_id'])
 
 
-    context_client_items = {
-        'name_client': get_name_client,
-        'show_order_item': show_order_item
-    }
+        list_id_order = data_order['list_id_order']
+        list_id_items = data_order['list_id_items']                 
+
+        sort_data = {}
+
+        for i in range(len(list_id_order)):
+            sort_data[str(list_id_order[i])] = list_id_items[i]
+
+        show_order_item = {}
+
+
+        for number, item_ids in sort_data.items():  
+            info_item = Items.objects.filter(id__in=item_ids, author_id_item=id_seller).values()  
+            show_order_item[number] = list(info_item)
+
+
+        context_client_items = {
+            'name_client': get_name_client,
+            'show_order_item': show_order_item
+        }
 
 
     return render(request, 'client_items.html', context_client_items)   

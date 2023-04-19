@@ -4,11 +4,8 @@
 Create item
 {% endblock %}
 
-
-
 {% block body %}
-
-<form action="/create_item" method="POST">
+<form action="/create_item/" method="POST">
     {% csrf_token %}
     
     <label for="posting">Назва товару</label>
@@ -42,10 +39,7 @@ Create item
     <br>
 
     <button type="submit">Добавити товар</button>
-    
 
 </form>
-
-
 
 {% endblock %}
