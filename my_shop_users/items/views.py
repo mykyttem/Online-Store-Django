@@ -1,10 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-from django.db.utils import IntegrityError
 from django.contrib import messages
-
-from django.utils.datastructures import MultiValueDictKeyError
 
 from .models import Items, Items_Reviews, Items_Questions, Items_Questions_Replys
 
@@ -14,20 +11,16 @@ import json
 
 def items(request):
     myitems = Items.objects.all().values()
-    
-    global search_item_field
-    search_item_field = ""
-    if request.method == 'POST':
-        search_item_field = request.POST.get('search_item_field', "")  
-        all_items_name_search = Items.objects.filter(name_items__icontains=search_item_field).first() # search name in DataBase
- 
 
+    if 'search_item_field' in request.POST:
+        search_item_field = request.POST.get('search_item_field')  
+        all_items_name_search = Items.objects.filter(name_items__icontains=search_item_field).first()
+        
         if not all_items_name_search:
             return render(request, 'error_pages/not_found_item.html', {'not_found_item': search_item_field})
         else:
-            return redirect(f'search_item/{search_item_field}')
-            
-
+            return redirect(f'search_item/{search_item_field}', search_item_field)
+         
     context = {
         'myitems': myitems # all items
     }
@@ -80,7 +73,7 @@ def item_search(request, result_item_name):
     
     context_result_search = {
         'all_items_search': all_items_search,
-        'search_item_field': search_item_field,
+        'search_item_field': result_item_name,
 
         # sorting
         'items_cheap_to_expencive': items_cheap_to_expencive,
@@ -98,8 +91,6 @@ def item_search(request, result_item_name):
 
 #TODO: поставити шифр/захист на cookie 
 #TODO: зробити, скільки потрібно замовити товару (наприклад: playstation 1, 2, 3) - і ціна змінюється
-
-#FIXME: видаляти з корзини можно тільки на сторінці товару
 def item_information(request, id, item_name):
     """Інформації о товарі, можно переглянути відгуки, та питання до товару, добавити в коризну"""
     responce = redirect('.')
@@ -108,7 +99,7 @@ def item_information(request, id, item_name):
     button_questions = request.GET.get('button_questions')
     button_shoping_basket = request.GET.get('btn_shoping_basket')
     
-    btn_delete_bussket_item = request.GET.get('btn_delete_bussket_item')
+    # btn_delete_bussket_item = request.GET.get('btn_delete_bussket_item')
 
     # count "reviews" and "questions"
     count_reviews_item = Items_Reviews.objects.filter(id_item_review=id).count() 
@@ -175,27 +166,10 @@ def item_information(request, id, item_name):
 
                 return responce
 
-
-            #FIXME ПРАЦЮЄ тільки на сторінці товару    
-            # if btn_delete_bussket_item: # get button and id_item
-            #     new_list = [dictonary for dictonary in json_data
-            #                 if dictonary['id_item'] != int(btn_delete_bussket_item)]
-
-            #     new_list_dict = {
-            #         "items_bussket": new_list   
-            #     }
-
-            #     responce.set_cookie('all_item_bussket', json.dumps(new_list_dict))     
-
-
-            #     return responce
-
         
         return render(request, 'item_information.html', context)
 
     
-        
-
 # function reviews for item
 def reviews_items(request, id, item_name):
     items_info = Items.objects.filter(id=id, name_items=item_name).values()

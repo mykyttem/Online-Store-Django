@@ -9,91 +9,7 @@
     {% block link %}{% endblock %}
 </head>
 <body>
-
-  
-<style>
-    nav {
-        background-color: #333333;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-      }
-      
-      nav ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        text-align: center;
-      }
-      
-      nav ul li {
-        display: inline-block;
-      }
-      
-      nav ul li a {
-        color: #fff;
-        display: block;
-        padding: 10px 30px;
-        text-decoration: none;
-      }
-      
-      nav ul li a:hover {
-        background-color: #555;
-      }
-
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-      }
-      
-      .modal-content {
-        background-color: white;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-      }
-      
-      .close {
-        color: #aaaaaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-      }
-      
-      .close:hover,
-      .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-      }
-      
-
-        
-      .block_shopping_cart {
-          background-color: #fff;
-          width: 150px;
-          height: 140px;
-          padding: 20px;
-          margin: 20px;
-          border-radius: 10px;
-          display: inline-block;
-          cursor: pointer; 
-      }
-      
-      
-      
-      
-  </style>
-
+  <link rel="stylesheet" href="{% static 'css/base.css'%}">
     <nav>
         <ul>
           <li><a href="/items">Головна</a></li>
@@ -106,7 +22,7 @@
             <input type="text" name="search_item_field" placeholder="Що ви шукаєте?" required/>    
             <button type="submit">Знайти</button>
           </form>
-        </ul>
+        </ul> 
     </nav>
 
 
@@ -120,20 +36,33 @@
                 {% if not save_value_keys %}
                     <h1>Кошик порожній</h1>
                 {% else %}
-                    {% for i in save_value_keys %}
-                        <h2>{{  i|safe  }}</h2>                      
+                    {% for i in save_value_keys%}
+                        {% for item in i %}
+                          <div class="block_shopping_cart" onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
+                                  <h2>{{item.name_items}}</h2>
+                                  <h2>{{item.price}}</h2>
+                  
+                                  <h2 style="display:none;">{{item.id}}</h2>
+                  
+                                  <form action="." method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="btn_delete_basket_item" value="{{ item.id }}">
+                                    <button type="submit">Видалити з корзини</button>
+                                  </form>
+                          </div>
+                        {% endfor %}
                     {% endfor %}
                 {% endif %}
 
+
                 {% if save_value_keys %}
                   <form method="GET" action="/checkout">
-                    <input type="hidden" name="order_item" value="{i['id_item']}">
+                    <input type="hidden" name="order_item" value="{{ item.id }}">
                     <button type="submit">Оформити замовлення</button>
                   </form>
                 {% endif %}
 
-                
-    
+          
             </div>
           </div>
       </div>
