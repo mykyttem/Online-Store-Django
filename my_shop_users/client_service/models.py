@@ -24,3 +24,5 @@ class Order_Items(models.Model):
 
     status_order = models.CharField(max_length=30, default='Очікування')
     date_order = models.DateTimeField(null=True)
+
+    id_confirmed_sellers = models.JSONField(default=[])

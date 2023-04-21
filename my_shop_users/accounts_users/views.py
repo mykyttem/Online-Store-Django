@@ -13,6 +13,7 @@ from datetime import datetime
 
 
 #TODO: добавити більше даних для користувача
+#TODO: Змінювати дані
 def accounts_users(request):
     if request.method == 'POST':
         login_user = request.POST['login']
@@ -212,78 +213,114 @@ def edit_item(request):
 
 def my_orders(request):
     id_user_session = request.session.get('id')
-
-    delete_from_order = request.GET.get('delete_from_order')
     get_id_order = request.GET.get('get_id_order')
 
     if not id_user_session:
         return HttpResponse('Увійдіть в кабінет')
     else:
         search_my_orders = Order_Items.objects.filter(id_client=id_user_session)
+        if search_my_orders:
+            if 'get_id_order' in request.GET:
+                get_id_order = request.GET.get('get_id_order')
 
-        data_order = {
-            'list_id_items': [],
-            'list_id_order': []
-        }
+                return redirect(f'/my_orders-items/{get_id_order}')
 
-        # get data from my_order, added in dict
-        for id in search_my_orders.values():
-            id_items = id['item_id']
-            id_order = id['id']  
-            
-            data_order['list_id_order'].append(id_order)        
-            data_order['list_id_items'].append(id_items) 
+            # delete duplicate id sellers
+            for id in search_my_orders.values():
+                sellers = id['authors_items']
+                sellers_conf = id['id_confirmed_sellers']
 
+                list_id_sellers = []
+                list_confirmed = []
 
-        list_id_order = data_order['list_id_order']
-        list_id_items = data_order['list_id_items']
-        
-        sort_data = {}
-
-        for i in range(len(list_id_order)):
-            sort_data[str(list_id_order[i])] = list_id_items[i]
-
-
-        show_order_item = {}
-
-
-        for number, item_ids in sort_data.items():  # Отримати ключ та значення (список item_ids) зі словника
-            info_item = Items.objects.filter(id__in=item_ids).values()  # Отримати інформацію за значеннями списку item_ids
-            show_order_item[number] = list(info_item)
+                for i in sellers:
+                    if i not in list_id_sellers:
+                        list_id_sellers.append(i)
+                
+                for x in sellers_conf:
+                    if x not in list_confirmed:
+                        list_confirmed.append(x)
+                
+            # all selers and sellers who confirmed order
+            count_sellers = len(list_id_sellers)
+            cout_confirmed = len(list_confirmed)
 
 
-        try:
+            if count_sellers == cout_confirmed:
+                update_status_order = search_my_orders.first()
+
+                update_status_order.status_order = 'Підтвердежено'
+                update_status_order.save()
+                
+        not_order_error = '<h1>У вас немає замовлень</h1>'
+        if not search_my_orders:
             context = {
-                'info_item': info_item,
-                'search_my_orders': search_my_orders.order_by('date_order').values(),
-                'show_order_item': show_order_item
-            }
-        except UnboundLocalError:
-            not_order_error = '<h1>У вас немає замовлень</h1>'
-            context = {
+                'search_my_orders': search_my_orders.values(),
                 'not_order_error': not_order_error,
-                'search_my_orders': search_my_orders.order_by('date_order').values(),
-                'show_order_item': show_order_item
             }
-
-        #TODO: Добавити видалення товару тільки якщо статус замовлення "Очікування"
-        if request.method == 'GET':
-            if delete_from_order: 
-                order_data_get = Order_Items.objects.get(id=get_id_order)
-
-                list_item_id_order = order_data_get.item_id  
-                list_item_id_order.remove(int(delete_from_order))
-            
-                order_data_get.item_id = list_item_id_order
-                order_data_get.save()
-
-                if not order_data_get.item_id:
-                    order_data_get.delete()
-
-                return redirect('./my_orders')
+        else:
+            context = {
+                'search_my_orders': search_my_orders.values(),
+            }
 
                 
     return render(request, 'my_orders.html', context)
+
+
+def my_orders_items(request, get_id_order):
+    id_user_session = request.session.get('id')
+
+    delete_from_order = request.GET.get('delete_from_order')
+    my_items_order = Order_Items.objects.filter(id=get_id_order, id_client=id_user_session).values()
+
+    data_order = {
+        'list_id_order': [],
+        'list_id_items': []
+    }
+
+    for i in my_items_order:    
+        data_order['list_id_order'].append(i['id'])
+        data_order['list_id_items'].append(i['item_id'])
+
+    list_id_order = data_order['list_id_order']
+    list_id_items = data_order['list_id_items']                 
+
+    sort_data = {}
+
+    for i in range(len(list_id_order)):
+        sort_data[str(list_id_order[i])] = list_id_items[i]
+
+    show_order_item = {}
+
+    for number, item_ids in sort_data.items():  
+        info_item = Items.objects.filter(id__in=item_ids).values()
+        show_order_item[number] = list(info_item)
+
+
+    if request.method == 'GET':
+        if delete_from_order: 
+            order_data_get = Order_Items.objects.get(id=get_id_order)
+
+            list_item_id_order = order_data_get.item_id  
+            list_item_id_order.remove(int(delete_from_order))
+        
+            order_data_get.item_id = list_item_id_order
+            order_data_get.save()
+
+            if not order_data_get.item_id:
+                order_data_get.delete()
+
+            return redirect('./my_orders/')
+
+
+    context = {
+        'get_id_order': get_id_order,
+        'show_order_item': show_order_item,
+        'my_items_order': my_items_order
+    }
+
+    return render(request, 'my_orders_items.html', context)
+
 
 
 def orders_my_client(request):
@@ -291,17 +328,34 @@ def orders_my_client(request):
     if not id_seller:
         return HttpResponse('Увійдіть в кабінет')
     else:
-        all_orders = Order_Items.objects.filter(authors_items__icontains=id_seller).values() 
+        all_orders = Order_Items.objects.filter(authors_items__icontains=id_seller).values()
         if 'get_id_order' in request.GET:
             get_name_client = request.GET.get('get_name_client')
             get_id_order = request.GET.get('get_id_order')
 
             return redirect(f'./items-cleint/{get_id_order}/{get_name_client}', get_id_order)        
-           
-            
-        context = {
-            'all_orders': all_orders
-        }
+
+
+        #FIXME: Зявляється кнопку при перезавнтажені сторінки
+        if 'get_id_order' in request.POST:
+            id_order = request.POST.get('get_id_order')
+            get_order = Order_Items.objects.filter(authors_items__icontains=id_seller, id=id_order).first()
+
+            get_order.id_confirmed_sellers += [id_seller]
+            get_order.save()
+            return redirect('.')
+
+        try:
+            context = {
+                'all_orders': all_orders,
+                'get_order': get_order,
+                'id_seller': id_seller,
+            }
+        except UnboundLocalError:     
+            context = {
+                'all_orders': all_orders,
+                'id_seller': id_seller
+            }
 
 
         return render(request, 'orders_my_client.html', context)

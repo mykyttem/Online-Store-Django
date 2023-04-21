@@ -11,6 +11,7 @@ urlpatterns = [
     path('edit_item', views.edit_item, name='edit_item'),
     
     path('my_orders/', views.my_orders, name='my_orders'),
+    path('my_orders-items/<int:get_id_order>/', views.my_orders_items, name='my_orders_items'),
     path('orders_my_client/', views.orders_my_client, name='orders_my_client'),
     path('orders_my_client/items-cleint/<int:get_id_order>/<str:get_name_client>', views.client_items, name='client_items')
 ]

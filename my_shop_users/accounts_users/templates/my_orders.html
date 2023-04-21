@@ -2,55 +2,52 @@
 
 {% block title %}Мої замовлення{% endblock %}
 
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/my_orders.css'%}">
+{% endblock %}
+
 {% block body %}
-
 <h1>Мої замовлення</h1>
-
-<style>
-    body {
-        background-color: #f5f5f5;
-    }
-
-    .block {
-        background-color: #ffff;
-        width: 200px;
-        height: 250px;
-        padding: 40px;
-        margin: 30px 30px 30px 50px;
-        border-radius: 10px;
-        display: inline-block;
-        cursor: pointer;
-      }
-</style>
-
 <hr>
-
 {{ not_order_error|safe }}
 
-{% for key, value in show_order_item.items %}
-<li>
-    <strong>Замовлення № </strong>
-    <ul>
-        {% for item in value %}
-        <div class="block" onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
-    
-            <form method="GET">
-                <input type="hidden" name="get_id_order" value="{{ key }}">
-                <input type="hidden" name="delete_from_order" value="{{ item.id }}">
-                <input type="submit" value="Видалити товар із списку замовлень">
-            </form>
+{% for my_order in search_my_orders %}
+    <div class="block-order">        
+        <h1 style="font-display: bont;"><b>Статус замовлення: {{my_order.status_order}}</b></h1>
+        <ul>
+            <h1>Вас звати: {{my_order.client_name}}</h1>
+            <h2>Ваши дані замовлення</h2>
 
-            
-            <ul>
-                <h1>Items</h1>
-          
-                <h4> {{ item.name_items }} </h4>
-                <h4> {{ item.price }} </h4>
-            </ul>
-        </div>
-        {% endfor %}
-    </ul>
-</li>
+            <li><strong>Номер:</strong> {{ my_order.client_number }}</li>
+            <li><strong>Email:</strong> {{my_order.client_email}}</li>
+            {% if my_order.payment_upon_receipt == True %}
+                <li><strong>Оплата:</strong>При отримані</li>
+            {% else %}
+                <li><strong>Оплата:</strong>Онлайн</li>
+            {% endif %}
+
+            <h2>Отримувач: </h2>
+            {% if my_order.I_receiver == True %}
+                <h2>Я</h2>
+            {% else %}
+                <h2>Інша людина</h2>
+            {% endif %}
+
+            <h2>Дзвінок:</h2>
+            {% if my_order.do_not_call_me_back == True %}
+                <h2>Перездвонити</h2>
+            {% else %}
+                <h2>Не передзванювати</h2>
+            {% endif %}
+
+            <br>
+            <form method="GET">
+                <input type="hidden" name="get_id_order" value="{{ my_order.id }}"/>
+                <button type="submit">Подивитися мої замовлені товари</button>
+            </form>         
+        </ul>
+    </div>
 {% endfor %}
 
 {% endblock %}
