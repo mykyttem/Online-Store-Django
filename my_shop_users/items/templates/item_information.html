@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
 
 
-{% block title %}
-{{ name_items }}
-{% endblock %}
+{% block title %}{{ name_items }}{% endblock %}
 
-<!-- connect css file for this html -->
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/item_information.css'%}">
@@ -16,10 +13,6 @@
 <br>
 <br>
 <br>
-
-
-<!-- Buttons touch item-->
-<!-- Button review for item -->
 <form method="GET">
     <input type="hidden" name="button_reviews" value="item_information">
     <input type="submit" value="Відгуки">
@@ -28,13 +21,11 @@
 
 <br>
 
-<!-- Button question for item -->
 <form method="GET">   
     <input type="hidden" name="button_questions" value="item_information">
     <input type="submit" value="Питання">
     <span style="font-weight: bold;">{{count_questions_item}}</span>
 </form>
-
 
 <div class="block">
     <div class="information-item-block">
@@ -47,7 +38,6 @@
         <h1>{{ items_info_description }}</h1>
 
         {% if not checking_item_in_bussket %}
-            <!-- Button shoping basket -->
             <form method="GET">   
                 <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
                 <input type="submit" value="Додати в кошик">
@@ -56,8 +46,11 @@
             <hr>
             <h1>Товар добавлен в кошик ✔</h1>
         {% endif %}
+        <hr>
+        {% for seller in get_seller %}
+            <a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</h1>
+        {% endfor %}
 
     </div>
 </div>
-
 {% endblock %}

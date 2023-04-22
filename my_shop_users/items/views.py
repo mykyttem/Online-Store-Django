@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.contrib import messages
 
 from .models import Items, Items_Reviews, Items_Questions, Items_Questions_Replys
+from accounts_users.models import Registration
 
 from datetime import datetime 
 import json
@@ -105,10 +106,13 @@ def item_information(request, id, item_name):
     count_reviews_item = Items_Reviews.objects.filter(id_item_review=id).count() 
     count_questions_item = Items_Questions.objects.filter(id_item_Questions=id).count()
  
-    # Get All Info for item, якщо співпадають дані
+    # Get All Info for item
     items_info = Items.objects.get(id=id, name_items=item_name) 
     items_info_price = items_info.price 
     items_info_description = items_info.description_items   
+
+    # get seller this item
+    get_seller = Registration.objects.filter(id=items_info.author_id_item).values()
 
     # checking for availability
     search_items = Items.objects.filter(name_items=item_name, id=id)
@@ -139,6 +143,8 @@ def item_information(request, id, item_name):
             'name_items': item_name,
             'items_info_price': items_info_price,
             'items_info_description': items_info_description,
+
+            'get_seller': get_seller,
             
             # count 
             'count_reviews_item': count_reviews_item,

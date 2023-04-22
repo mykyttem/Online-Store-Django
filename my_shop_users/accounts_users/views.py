@@ -174,6 +174,19 @@ def edit_profile(request):
     return render(request, 'edit_profile.html', context)
 
 
+def see_profile_seller(request, id, login):
+    items_seller = Items.objects.filter(author_id_item=id).values()        
+
+    context = {
+        'id': id,
+        'login': login,
+        'items_seller': items_seller
+    }
+
+
+    return render(request, 'profile_seller.html', context)
+
+
 
 def create_item(request):
     id_user = request.session.get('id')

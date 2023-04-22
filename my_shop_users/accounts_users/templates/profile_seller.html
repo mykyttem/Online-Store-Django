@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile seller "name"{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+    
+    .block {
+        background-color: #ffff;
+        width: 150px;
+        height: 140px;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 10px;
+        display: inline-block;
+        cursor: pointer; 
+    }    
+</style>
+
+<h1>Продавець {{login}}</h1>
+
+{% for x in items_seller %}      
+    <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
+            <h1>Photo_item</h1>
+            <h4> {{ x.name_items }} </h4>
+            <h4> {{ x.price }} </h4>
+        </ul>
+    </div>
+{% endfor %}  
+
+
+{% endblock %}
