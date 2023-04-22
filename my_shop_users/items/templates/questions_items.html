@@ -20,17 +20,16 @@
 
 
 <style>
-    /* Стилі для модального вікна */
     .modal {
-        display: none; /* Початково ховаємо вікно */
-        position: fixed; /* Фіксована позиція */
-        z-index: 1; /* Встановлюємо високий показник зверху */
+        display: none;
+        position: fixed; 
+        z-index: 1;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        overflow: auto; /* Дозволяє прокручувати вміст вікна */
-        background-color: rgba(0,0,0,0.4); /* Темне фонове покриття */
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4); 
     }
     
     .modal-content {
@@ -40,11 +39,9 @@
         border: 1px solid #888;
         width: 80%;
       }
-    
-  
-  /* Стилі для кнопки */
+
   button {
-    background-color: #4CAF50; /* Зелений колір кнопки */
+    background-color: #4CAF50; 
     border: none;
     color: white;
     padding: 10px 20px;
@@ -59,7 +56,6 @@
     .ReplyForm {
         display: none;
     }
-
 
     .modal-replyEdit {
         display: none;
@@ -115,7 +111,6 @@
         
             <form action="/items/{{ x.id }}/{{ x.name_items }}/questions" method="POST">
                 {% csrf_token %}
-                <!-- Get id this item -->
                 <input type="hidden" name="id_item_Questions" value="{{ x.id }}">
                 
                 <h4>Ведіть ваше питання</h4>
@@ -127,12 +122,9 @@
                 <button type="submit">Добавити питання</button>
             </form>
             
-
-            <!-- Expect error -->
             {% for msg in messages %}
             <h1>Щоб залишити питання або відгук, треба увійти в акаунт</h1> 
             {% endfor %}
-            
 
         {% endfor %}  
 </div>
@@ -189,7 +181,16 @@
 
             
             <button type="submit" onclick="ReplyForm('{{ questions.id }}')">Відповісти</button>
-        
+            
+            <form method="GET">
+                <input type="hidden" name="btn_useful_question" value="{{questions.id}}">
+                <button type="submit">Корисне питання {{questions.count_useful_Questions|length}}</button>
+            </form>
+
+            <form method="GET">
+                <input type="hidden" name="btn_not_useful_question" value="{{questions.id}}">
+                <button type="submit">Не корисне {{questions.count_not_useful_Questions|length}}</button>
+            </form>
 
             <div class="ReplyForm" id="ReplyForm-{{ questions.id }}">
                 <form method="POST">
@@ -205,7 +206,7 @@
                 {% if questions.id == question.id_item_Questions_reply %}
                     <div class="My_Reply" tyle="float: right;">
                         <span>{{ question.date_Questions_reply }}</span>
-                        <h2>{{ question.login_user_Questions_reply }}</h2>
+                        <h2>{{ question.login_user_Questions_reply }}</h2> 
                         
                         <hr>
                         <p>{{ question.text_Questions_reply }}</p>
@@ -233,28 +234,41 @@
             {% endfor %}
             
            
-            
-
             <!-- other replys -->
             {% for question in see_reply_this_item %}
                 {% if questions.id == question.id_item_Questions_reply %}  
                     {% if question.id_user_Questions_reply != id_user_Questions %}
                         <div class="Replys_Question" tyle="float: right;">
                             <span>{{ question.date_Questions_reply }}</span>
-                            <h2>{{ question.login_user_Questions_reply }}</h2>
+
+                            {% for i in items_info %}
+                                {% if question.id_user_Questions_reply ==  i.author_id_item%}
+                                    <h2>{{ question.login_user_Questions_reply }} - <span>Продавець</span></h2>
+                                {% else %}
+                                    <h2>{{ question.login_user_Questions_reply }}</h2>
+                                {% endif %}
+                            {% endfor %}
                             <hr>
                             <p>{{ question.text_Questions_reply }}</p>
+
+                            <form method="GET">
+                                <input type="hidden" name="btn_useful_question_reply" value="{{questions.id}}">
+                                <button type="submit">Корисна відповідь {{questions.count_useful_Questions_reply|length}}</button>
+                            </form>
+                
+                            <form method="GET">
+                                <input type="hidden" name="btn_not_useful_question_reply" value="{{questions.id}}">
+                                <button type="submit">Не корисна відповідь {{questions.count_not_useful_Questions_reply|length}}</button>
+                            </form>
+                            
                         </div>
                     {% endif %}
                 {% endif %}
             {% endfor %}
             <br>    
         </div>
-   
-        
     {% endif %}
 {% endfor %}
-
 
 
 <!-- EDIT FIELD FOR Questios -->

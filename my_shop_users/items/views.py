@@ -176,7 +176,6 @@ def item_information(request, id, item_name):
         return render(request, 'item_information.html', context)
 
     
-# function reviews for item
 def reviews_items(request, id, item_name):
     items_info = Items.objects.filter(id=id, name_items=item_name).values()
 
@@ -188,6 +187,10 @@ def reviews_items(request, id, item_name):
     id_item_review = request.POST.get('id_item_review')
     delete_my_review = request.POST.get('delete_my_review')
 
+    useful_review = request.GET.get('btn_useful_review')
+    not_useful_review = request.GET.get('btn_not_useful_review')
+
+
     if 'text_review' in request.POST:
         text_review = request.POST['text_review']
         advantages_item = request.POST['advantages_item']
@@ -198,13 +201,15 @@ def reviews_items(request, id, item_name):
             messages.success(request, "Щоб залишит відгук, треба увійти в аккунт")
             return redirect(f'/items/{id}/{item_name}/reviews')
         else:
-            # check dublicae review person
-            check_review_person = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id) # "check id_user_review" and "id_item_review_id"
+            # check dublicate review person
+            check_review_person = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id) 
             if not check_review_person:
-                # date added reiview
+                # date added review
                 date_reviews = datetime.now()
 
-                new_review = Items_Reviews(login_user_review=login_user_review, id_user_review=id_user_review, date_reviews=date_reviews, text_review=text_review, advantages_item=advantages_item, disadvantages_item=disadvantages_item, id_item_review=id_item_review)
+                new_review = Items_Reviews(login_user_review=login_user_review, id_user_review=id_user_review, 
+                                           date_reviews=date_reviews, text_review=text_review, 
+                                           advantages_item=advantages_item, disadvantages_item=disadvantages_item, id_item_review=id_item_review)
                 new_review.save()
                 
                 return redirect(f'/items/{id}/{item_name}/reviews')
@@ -212,12 +217,36 @@ def reviews_items(request, id, item_name):
                 return HttpResponse('Вже все оставляли свій відгук на цьому товарі')
             
     # find my review
-    find_my_review_this_item = Items_Reviews.objects.filter(id_user_review=id_user_review,  id_item_review=id) # "check id_user_review" and "id_item_review_id"
+    find_my_review_this_item = Items_Reviews.objects.filter(id_user_review=id_user_review,  id_item_review=id)
 
     # activate button - delete my review
     if delete_my_review:
         find_my_review_this_item.delete()
 
+    
+    if useful_review:
+        review = Items_Reviews.objects.filter(id=useful_review).first()
+
+        if id_user_review in review.count_useful_review:
+            review.count_useful_review.remove(id_user_review)
+        else:
+            review.count_useful_review.append(id_user_review)
+
+        review.save()
+        return redirect('./reviews')
+    
+
+    if not_useful_review:
+        review = Items_Reviews.objects.filter(id=not_useful_review).first()
+
+        if id_user_review in review.count_not_useful_review:
+            review.count_not_useful_review.remove(id_user_review)
+        else:
+            review.count_not_useful_review.append(id_user_review)
+
+        review.save()
+        return redirect('./reviews')
+        
 
     if 'text_review_edit' in request.POST:
         # fields edit, advantages, disadvantages, delete
@@ -258,9 +287,8 @@ def reviews_items(request, id, item_name):
     return render(request, 'reviews_items.html', context)
 
 
-# function questions for item
 def questions_items(request, id, item_name):
-    items_info = Items.objects.filter(id=id, name_items=item_name).values() # get all info for element, якщо співпадають дані 
+    items_info = Items.objects.filter(id=id, name_items=item_name).values()
 
     # get session user - id, login
     login_user_Questions = request.session.get('login')
@@ -269,20 +297,24 @@ def questions_items(request, id, item_name):
 
     # get the item id under which the comment was left
     id_item_Questions = request.POST.get('id_item_Questions')
- 
-    # button Delete, and edit my Questions
     delete_my_Questions = request.POST.get('delete_my_Questions')
+
+
+    useful_question = request.GET.get('btn_useful_question')
+    not_useful_question = request.GET.get('btn_not_useful_question')
+
+    useful_question_reply = request.GET.get('btn_useful_question_reply')
+    not_useful_question_reply = request.GET.get('btn_not_useful_question_reply')
 
 
     if 'text_Questions' in request.POST:
         text_Questions = request.POST['text_Questions']
 
-
         if not login_user_Questions:
             messages.success(request, "Щоб залишит відгук, треба увійти в аккунт")
             return redirect(f'/items/{id}/{item_name}/questions')
         else:
-            # check dublicae Questions person
+            # check dublicate Questions person
             check_Questions_person = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id) # "check id_user_Questions" and "id_item_Questions_id"
             if not check_Questions_person:
                 date_Questions = datetime.now()
@@ -299,9 +331,57 @@ def questions_items(request, id, item_name):
 
     # activate button - delete my Questions
     if delete_my_Questions:
-        # find my Questions
         find_my_Questions_this_item.delete()
+
+    
+    if useful_question:
+        get_data_question = Items_Questions.objects.filter(id=useful_question).first()
+
+        if id_user_Questions in get_data_question.count_useful_Questions:
+            get_data_question.count_useful_Questions.remove(id_user_Questions)
+        else:
+            get_data_question.count_useful_Questions.append(id_user_Questions)
+          
+        get_data_question.save()
+        return redirect('./questions')
+
+
+    if not_useful_question:
+        get_data_question = Items_Questions.objects.filter(id=not_useful_question).first()
         
+        if id_user_Questions in get_data_question.count_not_useful_Questions:
+            get_data_question.count_not_useful_Questions.remove(id_user_Questions)
+        else:
+            get_data_question.count_not_useful_Questions.append(id_user_Questions)
+            
+
+        get_data_question.save()
+        return redirect('./questions')
+        
+        
+    if useful_question_reply:
+        get_data_question_reply = Items_Questions_Replys.objects.filter(id=useful_question_reply).first()
+
+        if id_user_Questions in get_data_question_reply.count_useful_Questions_reply:
+            get_data_question_reply.count_useful_Questions_reply.remove(id_user_Questions)
+        else:
+            get_data_question_reply.count_useful_Questions_reply.append(id_user_Questions)
+
+        get_data_question_reply.save()
+        return redirect('./questions')
+        
+    
+    if not_useful_question_reply:
+        get_data_question_reply = Items_Questions_Replys.objects.filter(id=not_useful_question_reply).first()
+
+        if id_item_Questions in get_data_question_reply.count_not_useful_Questions_reply:
+            get_data_question_reply.count_not_useful_Questions_reply.remove(id_user_Questions)
+        else:
+            get_data_question_reply.count_not_useful_Questions_reply.append(id_user_Questions)
+
+        get_data_question_reply.save()
+        return redirect('./questions')
+
 
     if 'text_Questions_edit' in request.POST:
         text_Questions_edit = request.POST['text_Questions_edit']
@@ -312,13 +392,11 @@ def questions_items(request, id, item_name):
             get_my_Questions.text_Questions = text_Questions_edit
             get_my_Questions.save() 
 
-        
 
     delete_my_reply = request.GET.get('delete_my_reply')
     if 'reply_id_quest' in request.POST:        
         reply_text = request.POST.get('reply_text')
         reply_id_quest = request.POST['reply_id_quest']
-
 
         # reply 
         date_reply = datetime.now()
@@ -334,7 +412,6 @@ def questions_items(request, id, item_name):
         find_my_reply.delete()
 
 
-    
     if 'reply_text_edit' in request.POST:
         reply_id_quest_edit = request.POST.get('reply_id_quest_edit')
         reply_text_edit = request.POST['reply_text_edit']
@@ -344,7 +421,6 @@ def questions_items(request, id, item_name):
         get_my_reply.text_Questions_reply = reply_text_edit
         get_my_reply.save(update_fields=['text_Questions_reply']) 
 
-        
 
     # show my Questions, and other Questions, only of this item
     see_Questionss_this_item = Items_Questions.objects.filter(id_item_Questions=id).values() 
