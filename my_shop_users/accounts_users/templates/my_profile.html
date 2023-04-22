@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-My profile
-{% endblock %}
+{% block title %} My profile {% endblock %}
 
 {% block link %}
     {% load static %}
@@ -30,15 +28,18 @@ My profile
     <br>
     <a href="/my_orders">Подивитися мої замовлення</a>
     <br>
+    <br>
     <a href="/orders_my_client">Замолвення моїх клієнтів</a>
+    <br>
+    <br>
+    <a href="/my_profile/edit-profile/">Редагування акаунт</a>
 
 </div>
 
 
 {% for x in myitems %}      
-    <div class="block">
+    <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
         <ul>
-            <!-- Edit - button  -->
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="item_id" value="{{ x.id }}">
@@ -47,22 +48,19 @@ My profile
                 <input type="hidden" name="category_items" value="{{ x.category_items }}">
                 <input type="hidden" name="phone" value="{{ x.phone }}">
                 <input type="hidden" name="price" value="{{ x.price }}">
-                
-        
+                        
                 <input type="submit" value="Edit item">
             </form>
     
             <br>
             <br>
 
-            <!-- Delete - button  -->
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="item_id" value="{{ x.id }}">
                 <input type="hidden" name="delete_item" value="my_profile">
                 <input type="submit" value="Delete post">
             </form>
-
 
             <h1>Photo_item</h1>
             <h4> {{ x.name_items }} </h4>

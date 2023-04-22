@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit profile{% endblock %}
+
+{% block body %}
+<h1>Редагування профіля</h1>
+<hr>
+
+{% for user in user_account %}
+<form method="POST">
+    {% csrf_token %}
+
+    {% for msg in messages %}
+        <h2>{{msg}}</h2> 
+    {% endfor %}
+
+    <label>Логін: </label>
+    <input type="text" name="edit_login" value="{{ user.login_user }}" placeholder="Ведіть новий логін">
+    <br>
+    <br>
+    <label>Email: </label>
+    <input type="text" name="edit_email" value="{{ user.email_user }}" placeholder="Ведіть новий email">
+    <br>
+    <br>
+
+    <label>Поточний пароль: </label>
+    <input type="password" id="actual_password" name="actual_password"  placeholder="Введіть поточний пароль" required>
+    <button type="button" onclick="togglePasswordVisibility('actual_password')">Показати пароль</button>
+    <br><br>
+    
+    <label>Новий пароль: </label>
+    <input type="password" id="edit_password" name="edit_password" placeholder="Введіть новий пароль" required>
+    <button type="button" onclick="togglePasswordVisibility('edit_password')">Показати пароль</button>
+    <br><br>
+    
+    <label>Підтвердіть новий пароль: </label>
+    <input type="password" id="password_confirm" name="password_confirm" placeholder="Підтвердіть новий пароль" required>
+    <button type="button" onclick="togglePasswordVisibility('password_confirm')">Показати пароль</button>
+    <br><br>
+    
+    <script>
+      function togglePasswordVisibility(inputId) {
+        var passwordInput = document.getElementById(inputId);
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+        } else {
+          passwordInput.type = "password";
+        }
+      }
+
+      function checkPasswords() {
+        var newPassword = document.getElementById("edit_password").value;
+        var newPasswordRepeat = document.getElementById("password_confirm").value;
+      
+        if (newPassword !== newPasswordRepeat) {
+          alert("Паролі не співпадають!");
+          return false;
+        }
+      
+        return true;
+      }       
+    </script>
+    <button type="submit" onclick="return checkPasswords()">Зберегти</button>
+</form>
+{% endfor %}
+
+{% endblock %}

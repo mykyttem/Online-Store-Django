@@ -13,7 +13,6 @@ from datetime import datetime
 
 
 #TODO: добавити більше даних для користувача
-#TODO: Змінювати дані
 def accounts_users(request):
     if request.method == 'POST':
         login_user = request.POST['login']
@@ -50,25 +49,21 @@ def sign_in(request):
         login_user = request.POST['login']
         password_user = request.POST['password']
 
-        # search login user, from DB
         search_login = Registration.objects.filter(login_user = login_user)
 
         if not search_login:
-            messages.success(request, "Not found account/not correct password")
+            messages.success(request, "Not found login/not correct password")
             return redirect('sign_in')
         else:
-            # get user from DB
             user = Registration.objects.get(login_user=login_user)
-            # check password
+            # check password, and save session
             if check_password(password_user, user.password_user):
-                # save session user
                 request.session['login'] = user.login_user
                 request.session['email'] = user.email_user 
                 request.session['id'] = user.id
 
                 return redirect('my_profile')
             else:
-                messages.success(request, "Incorrect password")
                 return redirect('sign_in')
 
 
@@ -107,7 +102,7 @@ def my_profile(request):
     if login_user == None:
         return HttpResponse('Ви забули увійти в аккаунт')
     
-    myitems = Items.objects.filter(author_id_item=id_user).values # витягуєм тільки ті товари, які стоврив користувач
+    myitems = Items.objects.filter(author_id_item=id_user).values 
  
     context = {
         'login_user': login_user,
@@ -124,8 +119,8 @@ def my_profile(request):
 
 
         if delete_item:
-            item_id_get = Items.objects.filter(id=item_id).first() # витягуєм тільки ті товари, які стоврив користувач
-            if item_id_get and item_id_get.author_id_item == id_user: # видалити товар той який пренадлежит користувачу
+            item_id_get = Items.objects.filter(id=item_id).first() # get only ті items, які create user
+            if item_id_get and item_id_get.author_id_item == id_user: # delete item той який належить user
                 item_id_get.delete()
                 
             return redirect('my_profile')
@@ -136,6 +131,47 @@ def my_profile(request):
         
 
     return render(request, 'my_profile.html', context)
+
+
+def edit_profile(request):
+    id_user = request.session.get('id')
+    if not id_user:
+        return HttpResponse('Увійдіть в кабінет')
+    else:
+        user_account = Registration.objects.filter(id=id_user).values()
+
+        if request.method == 'POST':
+            edit_login = request.POST['edit_login']
+            edit_email = request.POST['edit_email']
+
+            actual_password = request.POST['actual_password']
+            edit_password_confirm = request.POST['password_confirm']
+            
+            edit_account = Registration.objects.get(id=id_user)
+            for i in user_account:
+                if edit_account:
+                    hashed_password = make_password(edit_password_confirm)
+
+                    edit_account.login_user = edit_login
+                    edit_account.email_user = edit_email
+                    edit_account.password_user = hashed_password
+                    
+                    if check_password(actual_password, i['password_user']):
+                        edit_account.save()
+                        messages.success(request, 'Увійдіть знову, для оновлення даних у профілі')
+                        return redirect('sign_in')
+                    elif len(edit_login) < 3:
+                        messages.success(request, "Короткий логін")
+                    else:
+                        messages.success(request, "Поточний пароль не вірний")
+
+
+        context = {
+            'user_account': user_account 
+        }
+
+
+    return render(request, 'edit_profile.html', context)
 
 
 
@@ -264,7 +300,7 @@ def my_orders(request):
             }
 
                 
-    return render(request, 'my_orders.html', context)
+    return render(request, 'orders/my_orders.html', context)
 
 
 def my_orders_items(request, get_id_order):
@@ -319,7 +355,7 @@ def my_orders_items(request, get_id_order):
         'my_items_order': my_items_order
     }
 
-    return render(request, 'my_orders_items.html', context)
+    return render(request, 'orders/my_orders_items.html', context)
 
 
 
@@ -358,7 +394,7 @@ def orders_my_client(request):
             }
 
 
-        return render(request, 'orders_my_client.html', context)
+        return render(request, 'orders/orders_my_client.html', context)
 
 
 def client_items(request, get_name_client, get_id_order):
@@ -402,4 +438,4 @@ def client_items(request, get_name_client, get_id_order):
         }
 
 
-    return render(request, 'client_items.html', context_client_items)   
+    return render(request, 'orders/client_items.html', context_client_items)   
