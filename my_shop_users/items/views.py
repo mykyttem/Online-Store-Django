@@ -145,6 +145,7 @@ def item_information(request, id, item_name):
             'items_info_description': items_info_description,
 
             'get_seller': get_seller,
+            'id_user': request.session.get('id'),
             
             # count 
             'count_reviews_item': count_reviews_item,

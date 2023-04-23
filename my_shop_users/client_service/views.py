@@ -35,7 +35,6 @@ def checkout(request):
         items_id_order.append(id['item_id'])
 
 
-    #TODO: Добавити щоб не було повторних товарів в одному замовлені
     # data checkout
     if request.method == 'POST': 
         if not id_user_session:
