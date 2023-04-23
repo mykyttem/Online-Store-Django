@@ -1,96 +1,17 @@
 {% extends 'base.html' %}
 
 
-{% block title %}
-{{ name_items }}  
-{% endblock %}
+{% block title %} {{ name_items }}  {% endblock %}
 
 
-<!-- connect css file for this html -->
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/questions_items.css'%}">
 {% endblock %}
 
 
-<!-- Body html -->
 {% block body %}
 <script defer src="{% static 'js/questions_items.js' %}"></script>
-
-
-
-<style>
-    .modal {
-        display: none;
-        position: fixed; 
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4); 
-    }
-    
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto; 
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-      }
-
-  button {
-    background-color: #4CAF50; 
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-  }
-
-    .ReplyForm {
-        display: none;
-    }
-
-    .modal-replyEdit {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-      }
-      
-      .modal-content-replyEdit {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-      }
-      
-      .close-replyEdit {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-      }
-      
-      .close-reply:hover,
-      .close-reply:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-      }
-</style>
 
 
 <div class="block">
@@ -129,24 +50,15 @@
         {% endfor %}  
 </div>
 
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
+<br><br><br><br><br><br>
 
 <!-- My Questions -->
 {% for my_Questions in show_my_Questions %}
     <div class="block-my-Questions">
         <h1 style="text-align: center;">Ваше питання</h1>
 
-
         <button onclick="openModal()">Редагувати питання</button>
-          
-       
+                 
         <!-- Delete - my Questions  -->
         <form method="POST">
             {% csrf_token %}
@@ -154,8 +66,7 @@
             <input  type="submit" style="float: right;" value="Delete Questions">
         </form>
 
-        <br>
-        <br>    
+        <br><br>    
 
         <span>{{ my_Questions.date_Questions }}</span>
         <h2>{{ my_Questions.login_user_Questions }}</h2>
@@ -168,107 +79,133 @@
 {% endfor %}
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <!-- See Questionss other users -->
-{% for questions in see_Questionss_this_item %}
-    {% if not show_my_Questions|length or questions.id != show_my_Questions.0.id %}
-        <div class="block-Questionss">
-            <span>{{ questions.date_Questions }}</span>
-            <h2>{{ questions.login_user_Questions }}</h2>
+<div id="all-questions">
+    {% for questions in see_Questionss_this_item %}
+        {% if not show_my_Questions|length or questions.id != show_my_Questions.0.id %}
+            <div class="block-Questionss">
+                <span>{{ questions.date_Questions }}</span>
+                <h2>{{ questions.login_user_Questions }}</h2>
 
-            <p>{{ questions.date_Questionss }}</p>
-            <hr>
-            <p>{{ questions.text_Questions }}</p>
+                <p>{{ questions.date_Questionss }}</p>
+                <hr>
+                <p>{{ questions.text_Questions }}</p>
 
-            
-            <button type="submit" onclick="ReplyForm('{{ questions.id }}')">Відповісти</button>
-            
-            <form method="GET">
-                <input type="hidden" name="btn_useful_question" value="{{questions.id}}">
-                <button type="submit">Корисне питання {{questions.count_useful_Questions|length}}</button>
-            </form>
-
-            <form method="GET">
-                <input type="hidden" name="btn_not_useful_question" value="{{questions.id}}">
-                <button type="submit">Не корисне {{questions.count_not_useful_Questions|length}}</button>
-            </form>
-
-            <div class="ReplyForm" id="ReplyForm-{{ questions.id }}">
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="reply_id_quest" value="{{ questions.id }}">
-                    <input type="text" name="reply_text" placeholder="Ведіть відповідь">
-                    <button type="submit">Відповісти</button>
+                
+                <button type="submit" onclick="ReplyForm('{{ questions.id }}')">Відповісти</button>
+                
+                <form method="GET">
+                    <input type="hidden" name="btn_useful_question" value="{{questions.id}}">
+                    <button type="submit">Корисне питання {{questions.count_useful_Questions|length}}</button>
                 </form>
-            </div>
 
-            <!-- my replys -->
-            {% for question in see_my_reply %}
-                {% if questions.id == question.id_item_Questions_reply %}
-                    <div class="My_Reply" tyle="float: right;">
-                        <span>{{ question.date_Questions_reply }}</span>
-                        <h2>{{ question.login_user_Questions_reply }}</h2> 
-                        
-                        <hr>
-                        <p>{{ question.text_Questions_reply }}</p>
-            
-                        <form method="GET">
-                            <input type="hidden" name="delete_my_reply" value="{{ question.id }}">
-                            <button type="submit">Видалити</button>
-                        </form>
-                    
-                        <button class="reply-edit-btn" data-reply-id="{{ question.id }}">Редагувати</button>
-            
-                        <div class="modal-replyEdit" id="modal-replyEdit-{{ question.id }}">
-                            <div class="modal-content-replyEdit">
-                                <span class="close-reply">&times;</span>
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="reply_id_quest_edit" value="{{ question.id }}">
-                                    <input type="text" name="reply_text_edit" value="{{ question.text_Questions_reply }}">
-                                    <button type="submit">Зберегти зміни</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-            
-           
-            <!-- other replys -->
-            {% for question in see_reply_this_item %}
-                {% if questions.id == question.id_item_Questions_reply %}  
-                    {% if question.id_user_Questions_reply != id_user_Questions %}
-                        <div class="Replys_Question" tyle="float: right;">
+                <form method="GET">
+                    <input type="hidden" name="btn_not_useful_question" value="{{questions.id}}">
+                    <button type="submit">Не корисне {{questions.count_not_useful_Questions|length}}</button>
+                </form>
+
+                <div class="ReplyForm" id="ReplyForm-{{ questions.id }}">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="reply_id_quest" value="{{ questions.id }}">
+                        <input type="text" name="reply_text" placeholder="Ведіть відповідь">
+                        <button type="submit">Відповісти</button>
+                    </form>
+                </div>
+
+                <!-- my replys -->
+                {% for question in see_my_reply %}
+                    {% if questions.id == question.id_item_Questions_reply %}
+                        <div class="My_Reply" tyle="float: right;">
                             <span>{{ question.date_Questions_reply }}</span>
-
-                            {% for i in items_info %}
-                                {% if question.id_user_Questions_reply ==  i.author_id_item%}
-                                    <h2>{{ question.login_user_Questions_reply }} - <span>Продавець</span></h2>
-                                {% else %}
-                                    <h2>{{ question.login_user_Questions_reply }}</h2>
-                                {% endif %}
-                            {% endfor %}
+                            <h2>{{ question.login_user_Questions_reply }}</h2> 
+                            
                             <hr>
                             <p>{{ question.text_Questions_reply }}</p>
-
-                            <form method="GET">
-                                <input type="hidden" name="btn_useful_question_reply" value="{{questions.id}}">
-                                <button type="submit">Корисна відповідь {{questions.count_useful_Questions_reply|length}}</button>
-                            </form>
                 
                             <form method="GET">
-                                <input type="hidden" name="btn_not_useful_question_reply" value="{{questions.id}}">
-                                <button type="submit">Не корисна відповідь {{questions.count_not_useful_Questions_reply|length}}</button>
+                                <input type="hidden" name="delete_my_reply" value="{{ question.id }}">
+                                <button type="submit">Видалити</button>
                             </form>
-                            
+                        
+                            <button class="reply-edit-btn" data-reply-id="{{ question.id }}">Редагувати</button>
+                
+                            <div class="modal-replyEdit" id="modal-replyEdit-{{ question.id }}">
+                                <div class="modal-content-replyEdit">
+                                    <span class="close-reply">&times;</span>
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="reply_id_quest_edit" value="{{ question.id }}">
+                                        <input type="text" name="reply_text_edit" value="{{ question.text_Questions_reply }}">
+                                        <button type="submit">Зберегти зміни</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
-                {% endif %}
-            {% endfor %}
-            <br>    
-        </div>
-    {% endif %}
-{% endfor %}
+                {% endfor %}
+                
+            
+                <!-- other replys -->
+                {% for question in see_reply_this_item %}
+                    {% if questions.id == question.id_item_Questions_reply %}  
+                        {% if question.id_user_Questions_reply != id_user_Questions %}
+                            <div class="Replys_Question" tyle="float: right;">
+                                <span>{{ question.date_Questions_reply }}</span>
+
+                                {% for i in items_info %}
+                                    {% if question.id_user_Questions_reply ==  i.author_id_item%}
+                                        <h2>{{ question.login_user_Questions_reply }} - <span>Продавець</span></h2>
+                                    {% else %}
+                                        <h2>{{ question.login_user_Questions_reply }}</h2>
+                                    {% endif %}
+                                {% endfor %}
+                                <hr>
+                                <p>{{ question.text_Questions_reply }}</p>
+
+                                <form method="GET">
+                                    <input type="hidden" name="btn_useful_question_reply" value="{{questions.id}}">
+                                    <button type="submit">Корисна відповідь {{questions.count_useful_Questions_reply|length}}</button>
+                                </form>
+                    
+                                <form method="GET">
+                                    <input type="hidden" name="btn_not_useful_question_reply" value="{{questions.id}}">
+                                    <button type="submit">Не корисна відповідь {{questions.count_not_useful_Questions_reply|length}}</button>
+                                </form>
+                                
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                <br>    
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    $(document).ready(function() {
+        var showMoreBtn = $('#show-more-btn');
+        var allquestions = $('#all-questions');
+        var questions = allquestions.find('.block-Questionss');
+        var numquestionsToShow = 20;
+        var numquestionsShown = numquestionsToShow;
+        
+        questions.slice(numquestionsToShow).hide();
+        
+        showMoreBtn.click(function() {
+            questions.slice(numquestionsShown, numquestionsShown + numquestionsToShow).fadeIn();
+            numquestionsShown += numquestionsToShow;
+            if (numquestionsShown >= questions.length) {
+                showMoreBtn.hide();
+            }
+        });
+    });
+</script>
+
+<button id="show-more-btn">Показати ще</button>
 
 
 <!-- EDIT FIELD FOR Questios -->

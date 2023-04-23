@@ -6,12 +6,18 @@ from django.contrib import messages
 from .models import Items, Items_Reviews, Items_Questions, Items_Questions_Replys
 from accounts_users.models import Registration
 
+from django.core.paginator import Paginator
+
 from datetime import datetime 
 import json
 
 
-def items(request):
-    myitems = Items.objects.all().values()
+def items(request):     
+    # Set up Paginations
+    p = Paginator(Items.objects.all(), 10)
+    page = request.GET.get('page')
+    all_items = p.get_page(page)
+
 
     if 'search_item_field' in request.POST:
         search_item_field = request.POST.get('search_item_field')  
@@ -21,27 +27,29 @@ def items(request):
             return render(request, 'error_pages/not_found_item.html', {'not_found_item': search_item_field})
         else:
             return redirect(f'search_item/{search_item_field}', search_item_field)
-         
+
+
     context = {
-        'myitems': myitems # all items
+        'all_items': all_items
     }
 
     return render(request, 'all_items.html', context)
 
 
 #TODO: зробити кнопку очистити фільтри
-#TODO: зробити ліміт на блоків в одну сторінку, щоб було наприклад: items/page1 or items/page2
-#TODO: добавити інші фільтри
 #FIXME: не завжди зявляється при пошуку(більше повязано з кнопками)
+#TODO: Зробити Paginator при сортіровке, та фільтрах
 def item_search(request, result_item_name):
     """ 
     На сторінці пошуку, зявляються результат пошуку, кнопки, сортуваня, фільтри.
     """
-    all_items_search = Items.objects.filter(name_items__icontains=result_item_name).values()
+    p_search = Paginator(Items.objects.filter(name_items__icontains=result_item_name).values(), 10)
+    page = request.GET.get('page')
+    
+    all_items_search = p_search.get_page(page)
 
     # fix bug, local variable    
     items_cheap_to_expencive, items_expencive_to_cheap, new_ones_first, reviews_result, filter_price = [], [], [], [], []
-
 
     if request.method == 'POST':
         # filters price
@@ -61,7 +69,7 @@ def item_search(request, result_item_name):
         
 
         if sort_cheap_to_expensive: 
-            items_cheap_to_expencive = Items.objects.filter(name_items__icontains=result_item_name).order_by('price').values() 
+            items_cheap_to_expencive = Items.objects.filter(name_items__icontains=result_item_name).order_by('price').values()
         if sort_expensive_tp_cheap:
             items_expencive_to_cheap = Items.objects.filter(name_items__icontains=result_item_name).order_by('-price').values()
         if new_item:
@@ -190,7 +198,6 @@ def reviews_items(request, id, item_name):
 
     useful_review = request.GET.get('btn_useful_review')
     not_useful_review = request.GET.get('btn_not_useful_review')
-
 
     if 'text_review' in request.POST:
         text_review = request.POST['text_review']

@@ -47,48 +47,8 @@
         
         {% endfor %}  
     </div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<style>
-    .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 1; 
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.4); 
-    }
-    
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-  }
-  
-  
-  button {
-    background-color: #4CAF50; 
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-  }
-</style>
 
+<br><br><br><br><br><br>
 <!-- My review -->
 {% for my_review in show_my_review %}
     <div class="block-my-review">
@@ -163,39 +123,64 @@
     </div>
 {% endfor %}
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- See reviews other users -->
-{% for review in see_reviews_this_item %}
-    {% if not show_my_review|length or review.id != show_my_review.0.id %}
-        <div class="block-reviews">
-            <h2>{{ review.login_user_review }}</h2>
-            <p>{{ review.date_reviews }}</p>
-            <hr>
-            <p>{{ review.text_review }}</p>
-            <h3>Переваги</h3>
-    
-            <ul>
-              <p>{{ review.advantages_item }}</p>
-            </ul>
-    
-            <h3>Не доліки</h3>
-    
-            <ul>
-              <p>{{ review.disadvantages_item }}</p>
-            </ul>
+<div id="all-reviews">
+    {% for review in see_reviews_this_item %}
+        {% if not show_my_review|length or review.id != show_my_review.0.id %}
+            <div class="block-reviews">
+                <h2>{{ review.login_user_review }}</h2>
+                <p>{{ review.date_reviews }}</p>
+                <hr>
+                <p>{{ review.text_review }}</p>
+                <h3>Переваги</h3>
+        
+                <ul>
+                <p>{{ review.advantages_item }}</p>
+                </ul>
+        
+                <h3>Не доліки</h3>
+        
+                <ul>
+                <p>{{ review.disadvantages_item }}</p>
+                </ul>
 
-            <form method="GET">
-                <input type="hidden" name="btn_useful_review" value="{{review.id}}">
-                <button type="submit">Корисний відгук {{review.count_useful_review|length}}</button>
-            </form>
+                <form method="GET">
+                    <input type="hidden" name="btn_useful_review" value="{{review.id}}">
+                    <button type="submit">Корисний відгук {{review.count_useful_review|length}}</button>
+                </form>
 
 
-            <form method="GET">
-                <input type="hidden" name="btn_not_useful_review" value="{{review.id}}">
-                <button type="submit">Не корисний відгук {{review.count_not_useful_review|length}}</button>
-            </form>
-        </div>
-    {% endif %}
-{% endfor %}
+                <form method="GET">
+                    <input type="hidden" name="btn_not_useful_review" value="{{review.id}}">
+                    <button type="submit">Не корисний відгук {{review.count_not_useful_review|length}}</button>
+                </form>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    $(document).ready(function() {
+        var showMoreBtn = $('#show-more-btn');
+        var allReviews = $('#all-reviews');
+        var reviews = allReviews.find('.block-reviews');
+        var numReviewsToShow = 20;
+        var numReviewsShown = numReviewsToShow;
+        
+        reviews.slice(numReviewsToShow).hide();
+        
+        showMoreBtn.click(function() {
+            reviews.slice(numReviewsShown, numReviewsShown + numReviewsToShow).fadeIn();
+            numReviewsShown += numReviewsToShow;
+            if (numReviewsShown >= reviews.length) {
+                showMoreBtn.hide();
+            }
+        });
+    });
+</script>
+
+<button id="show-more-btn">Показати ще</button>
 
 {% endblock %}

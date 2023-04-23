@@ -6,7 +6,14 @@
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 
-    cursor: pointer; /* зміни курсора на пальцевий */
+    cursor: pointer; 
+}
+
+.left_block_filters {
+    float: left;
+    width: 20%;
+    height: 400px;
+    background-color: #ffffff;
 }
 
 .block_sort_expencive {
@@ -17,7 +24,7 @@
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 
-    cursor: pointer; /*зміни курсора на пальцевий */
+    cursor: pointer;
 }
 
 
@@ -29,7 +36,7 @@
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 
-    cursor: pointer; /* зміни курсора на пальцевий */
+    cursor: pointer; 
 }
 
 
@@ -41,7 +48,7 @@
     margin: 20px;
     border-radius: 10px;
     display: inline-block;
-    cursor: pointer; /* зміни курсора на пальцевий */
+    cursor: pointer; 
 }
 
 .filter_price {
@@ -52,10 +59,8 @@
     margin: 20px;
     border-radius: 10px;
     display: inline-block;
-    cursor: pointer; /* зміни курсора на пальцевий */
+    cursor: pointer; 
 }
-
-
 
 
 .block_search_item {

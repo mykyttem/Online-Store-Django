@@ -1,37 +1,44 @@
 {% extends 'base.html' %}
 
-{% block title %}
-All items
-{% endblock %}
+{% block title %} All items {% endblock %}
 
-<!-- connect css file for this html -->
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/all_items.css'%}">
 {% endblock %}
 
-
-
 {% block body %}
-
-
-
-
-
-{% for x in myitems %}      
+{% for x in all_items %}
     <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
-        
         <ul>
             <h1>Items</h1>
             <h4> {{ x.name_items }} </h4>
             <h4> {{ x.price }} </h4>
         </ul>
-        
     </div>
-{% endfor %}  
+{% endfor %}
 
+<br/></br/>
 
+<div class="pagination">
+    {% if all_items.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+    {% else %}
+        <span class="disabled">&laquo; First</span>
+    {% endif %}
 
+    {% for num in all_items.paginator.page_range %}
+        {% if num == all_items.number %}
+            <span class="active">{{ num }}</span>
+        {% elif num > all_items.number|add:"-3" and num < all_items.number|add:"3" %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
 
-
+    {% if all_items.has_next %}
+            <a href="?page={{ all_items.paginator.num_pages }}">Last &raquo;</a>
+    {% else %}
+            <span class="disabled">Last &raquo;</span>
+    {% endif %}
+</div>
 {% endblock %}

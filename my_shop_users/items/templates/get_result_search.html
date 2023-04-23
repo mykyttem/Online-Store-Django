@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    {{ search_item_field }}
-{% endblock %}
+{% block title %} {{ search_item_field }} {% endblock %}
 
-<!-- connect css file for this html -->
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/all_items.css'%}">
@@ -14,15 +11,6 @@
 
 {% block body %}
 <script defer src="{% static 'js/get_result_search.js' %}"></script>
-
-<style>    
-    .left_block_filters {
-        float: left;
-        width: 20%;
-        height: 400px;
-        background-color: #ffffff;
-    }
-</style>
 
 <div class="left_block_filters">
     <h1>Фільтри</h1>
@@ -87,7 +75,6 @@
 </div>
 
 
-
 <!-- sort new item -->
 <div class="main_block_newItem">
     {% for new_item in new_ones_first %}
@@ -105,14 +92,12 @@
 <!-- sort від дешевого до дорогих -->
 <div class="main_block_sort_chp_to_exp">
     {% for item_sort_сheap in items_cheap_to_expencive%}
-
         <div class="block_sort_cheap" onclick="window.location.href='/items/{{ item_sort_сheap.id }}/{{ item_sort_сheap.name_items }}'">
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ item_sort_сheap.name_items }} </h4>
                 <h4> {{ item_sort_сheap.price }} </h4>
             </ul>
-            
         </div>
     {% endfor %}
 </div>
@@ -148,7 +133,6 @@
 </div>
 
 
-
 <!-- result item -->
 <div class="block_search_item">
     {% for item in all_items_search %}
@@ -160,6 +144,29 @@
             </ul>        
         </div>
     {% endfor %}
+
+    <div class="pagination">
+        {% if all_items_search.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+        {% else %}
+            <span class="disabled">&laquo; First</span>
+        {% endif %}
+    
+        {% for num in all_items_search.paginator.page_range %}
+            {% if num == all_items_search.number %}
+                <span class="active">{{ num }}</span>
+            {% elif num > all_items_search.number|add:"-3" and num < all_items_search.number|add:"3" %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+    
+        {% if all_items_search.has_next %}
+                <a href="?page={{ all_items_search.paginator.num_pages }}">Last &raquo;</a>
+        {% else %}
+                <span class="disabled">Last &raquo;</span>
+        {% endif %}
+    </div>
+
 </div>
 
 
