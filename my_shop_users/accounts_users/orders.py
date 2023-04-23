@@ -131,7 +131,6 @@ def orders_my_client(request):
             return redirect(f'./items-cleint/{get_id_order}/{get_name_client}', get_id_order)        
 
 
-        #FIXME: Зявляється кнопку при перезавнтажені сторінки
         if 'get_id_order' in request.POST:
             id_order = request.POST.get('get_id_order')
             get_order = Order_Items.objects.filter(authors_items__icontains=id_seller, id=id_order).first()
@@ -149,7 +148,7 @@ def orders_my_client(request):
         except UnboundLocalError:     
             context = {
                 'all_orders': all_orders,
-                'id_seller': id_seller
+                'id_seller': id_seller,
             }
 
 

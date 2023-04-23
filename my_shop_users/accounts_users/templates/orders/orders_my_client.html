@@ -49,14 +49,14 @@
                 <button type="submit">Подивитися замовлені товари</button>
             </form>
             <br>
-            {% if not id_seller in get_order_all.id_confirmed_sellers %}
+            {% if id_seller in order.id_confirmed_sellers %}
+                <h1>Ви підтвердили замовлення</h2>
+            {% else %}
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="get_id_order" value="{{ order.id }}"/>
-                    <button type="submit" class="button_send_order"  onclick="hideButton()">Відправлено</button>
+                    <button type="submit" class="button_send_order">Відправлено</button>
                 </form>
-            {% else %}
-                <h1>Ви підтвердили замовлення</h2>
             {% endif %}            
         </ul>
     </div>
