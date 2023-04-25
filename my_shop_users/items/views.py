@@ -36,46 +36,46 @@ def items(request):
     return render(request, 'all_items.html', context)
 
 
-#TODO: зробити кнопку очистити фільтри
-#FIXME: не завжди зявляється при пошуку(більше повязано з кнопками)
-#TODO: Зробити Paginator при сортіровке, та фільтрах
+#FIXME: Fix Filters, and paginator after sorting buttons, filter
 def item_search(request, result_item_name):
     """ 
-    На сторінці пошуку, зявляються результат пошуку, кнопки, сортуваня, фільтри.
+    On the search page, with available search results, buttons, sorting, filters.
     """
-    p_search = Paginator(Items.objects.filter(name_items__icontains=result_item_name).values(), 10)
+    search = Items.objects.filter(name_items__icontains=result_item_name)
+    p_search = Paginator(search.values(), 10)
     page = request.GET.get('page')
     
     all_items_search = p_search.get_page(page)
 
     # fix bug, local variable    
     items_cheap_to_expencive, items_expencive_to_cheap, new_ones_first, reviews_result, filter_price = [], [], [], [], []
-
-    if request.method == 'POST':
-        # filters price
-        first_price = request.POST['first_price']
-        last_price = request.POST['last_price']
-
-        # apply price filter
-        filter_price = Items.objects.filter(name_items__icontains=result_item_name, price__gte=first_price, price__lte=last_price).values()
-        
+    
 
     if request.method == 'GET':
-        # buttons - від дешевих до дорогих, від дорого до дешевого, New items, Reviews
+        # buttons sorting
         sort_cheap_to_expensive = request.GET.get('sort_cheap_to_expensive', "") 
         sort_expensive_tp_cheap = request.GET.get('sort_expensive_to_cheap', "") 
         new_item = request.GET.get('newItem', "") 
         more_review = request.GET.get('more_review', "")
-        
+
+        # filters 
+        first_price = request.GET.get('first_price', "")
+        last_price = request.GET.get('last_price', "")
+
+        if first_price and last_price:
+            filter_price = Items.objects.filter(name_items__icontains=result_item_name, price__gte=first_price, price__lte=last_price).values()
 
         if sort_cheap_to_expensive: 
-            items_cheap_to_expencive = Items.objects.filter(name_items__icontains=result_item_name).order_by('price').values()
+           items_cheap_to_expencive = search.order_by('price').values()
+
         if sort_expensive_tp_cheap:
-            items_expencive_to_cheap = Items.objects.filter(name_items__icontains=result_item_name).order_by('-price').values()
+            items_expencive_to_cheap = search.order_by('-price').values()
+
         if new_item:
-            new_ones_first = Items.objects.filter(name_items__icontains=result_item_name).order_by('-id').values()
+            new_ones_first = search.order_by('-id').values()
+
         if more_review:
-            reviews = Items.objects.filter(name_items__icontains=result_item_name).values_list('id', flat=True) # search id this item
+            reviews = search.values_list('id', flat=True) # search id this item
             review_find = Items_Reviews.objects.filter(id_item_review__in=reviews).values_list('id_item_review', flat=True) # search id_review this item
             reviews_result = Items.objects.filter(id__in=review_find).values() # get item this review 
             

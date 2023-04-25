@@ -14,12 +14,12 @@
 
 <div class="left_block_filters">
     <h1>Фільтри</h1>
-    <button onclick="reset_filter();">Очистити фільтри</button>
-    <h2>Ціна</h2>
+    <button onclick="reset_filters();">Скинути фільтри</button>
 
+    <h2>Ціна</h2>
     <h4>від</h4>
-    <form method="POST">
-        {% csrf_token %}
+
+    <form method="GET">
         <input type="number" name="first_price" style="width: 20%;" value="0">
         <h4>До</h4>
         <input type="number" name="last_price" style="width: 20%;" value="0">
@@ -113,9 +113,8 @@
                 <h4> {{ item_sort_expencive.name_items }} </h4>
                 <h4> {{ item_sort_expencive.price }} </h4>
             </ul>
-            
         </div>
-    {% endfor %}
+    {% endfor %}>
 </div>
 
 
@@ -145,6 +144,7 @@
         </div>
     {% endfor %}
 
+    <br><br>
     <div class="pagination">
         {% if all_items_search.has_previous %}
             <a href="?page=1">&laquo; First</a>
@@ -161,7 +161,7 @@
         {% endfor %}
     
         {% if all_items_search.has_next %}
-                <a href="?page={{ all_items_search.paginator.num_pages }}">Last &raquo;</a>
+                <a href="?page={{ .paginator.num_pages }}">Last &raquo;</a>
         {% else %}
                 <span class="disabled">Last &raquo;</span>
         {% endif %}
