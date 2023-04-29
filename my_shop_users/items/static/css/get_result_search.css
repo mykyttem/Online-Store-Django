@@ -1,8 +1,8 @@
 .block_sort_cheap {
     background-color: #ffff;
     width: 150px;
-    height: 140px;
-    padding: 20px;
+    height: 250px;
+    padding: 30px;
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 
@@ -19,8 +19,8 @@
 .block_sort_expencive {
     background-color: #ffff;
     width: 150px;
-    height: 140px;
-    padding: 20px;
+    height: 250px;
+    padding: 30px;
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 
@@ -31,8 +31,8 @@
 .block_newItem {
     background-color: #ffff;
     width: 150px;
-    height: 140px;
-    padding: 20px;
+    height: 250px;
+    padding: 30px;
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 
@@ -43,8 +43,8 @@
 .block_more_review {
     background-color: #ffff;
     width: 150px;
-    height: 140px;
-    padding: 20px;
+    height: 250px;
+    padding: 30px;
     margin: 20px;
     border-radius: 10px;
     display: inline-block;
@@ -54,8 +54,8 @@
 .filter_price {
     background-color: #ffff;
     width: 150px;
-    height: 140px;
-    padding: 20px;
+    height: 250px;
+    padding: 30px;
     margin: 20px;
     border-radius: 10px;
     display: inline-block;

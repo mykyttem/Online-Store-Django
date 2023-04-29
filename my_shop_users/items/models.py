@@ -6,16 +6,20 @@ class Items(models.Model):
     description_items = models.CharField(max_length=255)
     category_items = models.CharField(max_length=255)
 
-    phone = models.IntegerField(null=True)
-    price = models.IntegerField(null=True)
-    joined_date = models.DateField(null=True)
-    author_id_item = models.IntegerField(null=True)
+    phone = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=0)
+    joined_date = models.DateField()
+    author_id_item = models.IntegerField()
 
-    status = models.CharField(max_length=255, null=True)
-    state = models.CharField(max_length=255, null=True)
-    guarantee = models.IntegerField(null=True)
+    status = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    guarantee = models.IntegerField(blank=True, null=True)
 
     amount_item = models.IntegerField()
+    
+    # old price
+    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
 
 class Items_Reviews(models.Model):

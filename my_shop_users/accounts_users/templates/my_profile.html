@@ -55,10 +55,19 @@
                 <input type="submit" value="Delete post">
             </form>
 
-            <h1>Photo_item</h1>
+            <h1>PHOTO</h1>
             <h4> {{ x.name_items }} </h4>
-            <h4> {{ x.price }} </h4>
             <h4>Кількість: {{ x.amount_item }} </h4>
+            {% if x.old_price < x.price or x.old_price == None %}
+                <h4> {{ x.price }} </h4>
+                
+            {% else %}
+                <h4><s>{{ x.old_price }}</s></h4>
+                <h4>Знижка: {{x.discount}}%</h4>
+                <h3> {{ x.price }} </h3>
+                <h4>Кількість: {{ x.amount_item }} </h4>
+            {% endif %}
+
         </ul>
     </div>
 {% endfor %}  

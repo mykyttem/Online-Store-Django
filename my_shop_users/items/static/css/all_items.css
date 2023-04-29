@@ -5,8 +5,8 @@ body {
 .block {
     background-color: #ffff;
     width: 150px;
-    height: 140px;
-    padding: 20px;
+    height: 250px;
+    padding: 30px;
     margin: 20px;
     border-radius: 10px;
     display: inline-block; 

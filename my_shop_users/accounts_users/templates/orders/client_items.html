@@ -12,8 +12,8 @@
     .block-item {
         background-color: #ffff;
         width: 200px;
-        height: 250px;
-        padding: 40px;
+        height: 380px;
+        padding: 20px;
         margin: 30px 30px 30px 50px;
         border-radius: 10px;
         display: inline-block;
@@ -28,10 +28,16 @@
         {% for item in value %}
             <div class="block-item" onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">                        
                 <ul>
-                    <h1>Items</h1>
-            
+                    <h1>PHOTO</h1>
                     <h4> {{ item.name_items }} </h4>
-                    <h4> {{ item.price }} </h4>
+            
+                    {% if item.old_price < item.price or item.old_price == None %}
+                        <h4> {{ item.price }} </h4>
+                    {% else %}
+                        <h4><s>{{ item.old_price }}</s></h4>
+                        <h4>Знижка: {{item.discount}}%</h4>
+                        <h3> {{ item.price }} </h3>
+                    {% endif %}
                 </ul>
             </div>
         {% endfor %}

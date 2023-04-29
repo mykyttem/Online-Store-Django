@@ -68,7 +68,14 @@
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ item_review.name_items }} </h4>
-                <h4> {{ item_review.price }} </h4>
+    
+                {% if item_review.old_price < item_review.price or x.old_price == None %}
+                    <h4> {{ item_review.price }} </h4>
+                {% else %}
+                    <h4><s>{{ item_review.old_price }}</s></h4>
+                    <h4>Знижка: {{item_review.discount}}%</h4>
+                    <h3> {{ item_review.price }} </h3>
+                {% endif %}
             </ul>
         </div>
     {% endfor %}
@@ -82,7 +89,14 @@
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ new_item.name_items }} </h4>
-                <h4> {{ new_item.price }} </h4>
+    
+                {% if new_item.old_price < new_item.price or x.old_price == None %}
+                    <h4> {{ new_item.price }} </h4>
+                {% else %}
+                    <h4><s>{{ new_item.old_price }}</s></h4>
+                    <h4>Знижка: {{new_item.discount}}%</h4>
+                    <h3> {{ new_item.price }} </h3>
+                {% endif %}
             </ul>
         </div>
     {% endfor %}
@@ -96,7 +110,14 @@
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ item_sort_сheap.name_items }} </h4>
-                <h4> {{ item_sort_сheap.price }} </h4>
+    
+                {% if item_sort_сheap.old_price < item_sort_сheap.price or x.old_price == None %}
+                    <h4> {{ item_sort_сheap.price }} </h4>
+                {% else %}
+                    <h4><s>{{ item_sort_сheap.old_price }}</s></h4>
+                    <h4>Знижка: {{item_sort_сheap.discount}}%</h4>
+                    <h3> {{ item_sort_сheap.price }} </h3>
+                {% endif %}
             </ul>
         </div>
     {% endfor %}
@@ -111,7 +132,14 @@
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ item_sort_expencive.name_items }} </h4>
-                <h4> {{ item_sort_expencive.price }} </h4>
+    
+                {% if item_sort_expencive.old_price < x.price or x.old_price == None %}
+                    <h4> {{ item_sort_expencive.price }} </h4>
+                {% else %}
+                    <h4><s>{{ item_sort_expencive.old_price }}</s></h4>
+                    <h4>Знижка: {{item_sort_expencive.discount}}%</h4>
+                    <h3> {{ item_sort_expencive.price }} </h3>
+                {% endif %}
             </ul>
         </div>
     {% endfor %}>
@@ -125,7 +153,14 @@
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ price.name_items }} </h4>
-                <h4> {{ price.price }} </h4>
+    
+                {% if price.old_price < price.price or x.old_price == None %}
+                    <h4> {{ price.price }} </h4>
+                {% else %}
+                    <h4><s>{{ price.old_price }}</s></h4>
+                    <h4>Знижка: {{price.discount}}%</h4>
+                    <h3> {{ price.price }} </h3>
+                {% endif %}
             </ul>
         </div>
     {% endfor %}
@@ -139,7 +174,14 @@
             <ul>
                 <h1>PHOTO</h1>
                 <h4> {{ item.name_items }} </h4>
-                <h4> {{ item.price }} </h4>
+    
+                {% if item.old_price < item.price or x.old_price == None %}
+                    <h4> {{ item.price }} </h4>
+                {% else %}
+                    <h4><s>{{ item.old_price }}</s></h4>
+                    <h4>Знижка: {{item.discount}}%</h4>
+                    <h3> {{ item.price }} </h3>
+                {% endif %}
             </ul>        
         </div>
     {% endfor %}

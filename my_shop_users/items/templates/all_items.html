@@ -11,34 +11,43 @@
 {% for x in all_items %}
     <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
         <ul>
-            <h1>Items</h1>
+            <h1>PHOTO</h1>
             <h4> {{ x.name_items }} </h4>
-            <h4> {{ x.price }} </h4>
+
+            {% if x.old_price < x.price or x.old_price == None %}
+                <h4> {{ x.price }} </h4>
+            {% else %}
+                <h4><s>{{ x.old_price }}</s></h4>
+                <h4>Знижка: {{x.discount}}%</h4>
+                <h3> {{ x.price }} </h3>
+            {% endif %}
         </ul>
     </div>
 {% endfor %}
 
-<br/></br/>
+<br/><br/>
 
-<div class="pagination">
-    {% if all_items.has_previous %}
-        <a href="?page=1">&laquo; First</a>
-    {% else %}
-        <span class="disabled">&laquo; First</span>
-    {% endif %}
-
-    {% for num in all_items.paginator.page_range %}
-        {% if num == all_items.number %}
-            <span class="active">{{ num }}</span>
-        {% elif num > all_items.number|add:"-3" and num < all_items.number|add:"3" %}
-            <a href="?page={{ num }}">{{ num }}</a>
+{% if all_items %}
+    <div class="pagination">
+        {% if all_items.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+        {% else %}
+            <span class="disabled">&laquo; First</span>
         {% endif %}
-    {% endfor %}
 
-    {% if all_items.has_next %}
-            <a href="?page={{ all_items.paginator.num_pages }}">Last &raquo;</a>
-    {% else %}
-            <span class="disabled">Last &raquo;</span>
-    {% endif %}
-</div>
+        {% for num in all_items.paginator.page_range %}
+            {% if num == all_items.number %}
+                <span class="active">{{ num }}</span>
+            {% elif num > all_items.number|add:"-3" and num < all_items.number|add:"3" %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if all_items.has_next %}
+                <a href="?page={{ all_items.paginator.num_pages }}">Last &raquo;</a>
+        {% else %}
+                <span class="disabled">Last &raquo;</span>
+        {% endif %}
+    </div>
+{% endif %}
 {% endblock %}
