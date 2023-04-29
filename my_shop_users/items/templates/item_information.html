@@ -27,15 +27,10 @@
     <span style="font-weight: bold;">{{count_questions_item}}</span>
 </form>
 
+<h1 style="text-align: center;" class="name_items">{{ name_items }}</h1>
 <div class="block">
     <div class="information-item-block">
-        <h1>{{ name_items }}</h1>
-
-        <hr>
-
         <h1>{{ items_info_price }} ₴</h1>
-        <hr>
-        <h1>{{ items_info_description }}</h1>
         
         {% for seller in get_seller %}
             {% if seller.id == id_user %}
@@ -54,9 +49,18 @@
             {% endif %}
             <hr>
         
-            <a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</h1>
+            <h2><a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</a></h2>
+            <h2>Номер продавця: {{phone}}</h2>
+            <h2>Стан: {{state}}</h2>
+            <h2>Статус: {{status}}</h2>
+            {% if guarantee %}
+                <h2>Гарантія: {{guarantee}} днів</h2>
+            {% else %}
+                <h2>Гарантії нема</h2>
+            {% endif %}
         {% endfor %}
-
     </div>
+    <h1 style="text-align: center;">Опис</h1>
+    <h1>{{ items_info_description }}</h1>
 </div>
 {% endblock %}

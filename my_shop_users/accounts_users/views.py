@@ -70,64 +70,49 @@ def sign_in(request):
 
 
 def my_profile(request):
-    login_user = request.session.get('login')
-    email_user = request.session.get('email')
     id_user = request.session.get('id')
-
-
-    # button
-    logout_profile = request.POST.get('logout_profile')
-    delete_item = request.POST.get('delete_item') 
-
-    # global variabes for edit item
-    global item_id
-
-    global name_items_get_edit
-    global description_get_edit
-    global category_get_items_edit
-
-    global phone_get_edit
-    global price_get_edit
-
-    # get field from items edit
-    item_id = request.POST.get('item_id')
-    name_items_get_edit = request.POST.get('name_items')
-    description_get_edit = request.POST.get('description_items')
-    category_get_items_edit = request.POST.get('category_items')
-    phone_get_edit = request.POST.get('phone')
-    price_get_edit = request.POST.get('price')    
-
-
-    if login_user == None:
+    if not id_user:
         return HttpResponse('Ви забули увійти в аккаунт')
+    else:
+        login_user = request.session.get('login')
+        email_user = request.session.get('email')
+
+        # button
+        logout_profile = request.POST.get('logout_profile')
+        delete_item = request.POST.get('delete_item') 
+
+
+        # get field from items edit
+        item_id = request.POST.get('item_id')
+        name_items_get_edit = request.POST.get('name_items')
     
-    myitems = Items.objects.filter(author_id_item=id_user).values 
- 
-    context = {
-        'login_user': login_user,
-        'email_user': email_user,    
-        'id_user': id_user,
-        'myitems': myitems
-        }
+        myitems = Items.objects.filter(author_id_item=id_user).values 
     
-    
-    if request.method == 'POST':
-        if logout_profile: 
-            request.session.flush() # logout button - delete session
-            return redirect('my_profile')
-
-
-        if delete_item:
-            item_id_get = Items.objects.filter(id=item_id).first() # get only ті items, які create user
-            if item_id_get and item_id_get.author_id_item == id_user: # delete item той який належить user
-                item_id_get.delete()
-                
-            return redirect('my_profile')
-
-
-        if edit_item:            
-            return redirect('edit_item')
+        context = {
+            'login_user': login_user,
+            'email_user': email_user,    
+            'id_user': id_user,
+            'myitems': myitems
+            }
         
+        
+        if request.method == 'POST':
+            if logout_profile: 
+                request.session.flush() # logout button - delete session
+                return redirect('my_profile')
+
+
+            if delete_item:
+                item_id_get = Items.objects.filter(id=item_id).first() # get only ті items, які create user
+                if item_id_get and item_id_get.author_id_item == id_user: # delete item той який належить user
+                    item_id_get.delete()
+                    
+                return redirect('my_profile')
+
+
+            if edit_item:            
+                return redirect(f'edit_item/{item_id}/{name_items_get_edit}/')
+            
 
     return render(request, 'my_profile.html', context)
 
@@ -182,14 +167,14 @@ def see_profile_seller(request, id, login):
         'items_seller': items_seller
     }
 
-
     return render(request, 'profile_seller.html', context)
 
 
 def create_item(request):
-    id_user = request.session.get('id')
+    id_seller = request.session.get('id')
+    seller = Registration.objects.filter(id=id_seller).values()
     
-    if not id_user:
+    if not id_seller:
         return HttpResponse('Увійдіть в кабінет')
     else:
         if request.method == 'POST':
@@ -197,58 +182,55 @@ def create_item(request):
             description_item = request.POST['description_item']
             category_items = request.POST['category_items']
 
-
             phone_user = request.POST['phone_user']
             price_item = request.POST['price_item']
+            guarantee = request.POST['guarantee_period']
 
-            id_user = request.session.get('id')        
-
-            # date create item
+            status_availability = request.POST.get('status_availability') 
+            state_new = request.POST.get('state_new')
+      
             date = datetime.now()
 
-            new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user)
+            new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_seller,
+                             status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=guarantee)
             new_item.save()
 
 
             return redirect('my_profile')
 
 
-    return render(request, 'create_item.html', {})
+    return render(request, 'create_item.html', {'seller': seller})
 
 
-def edit_item(request):
-    id_user = request.session.get('id')
-    if not id_user:
+def edit_item(request, item_id, name_items_get_edit):
+    id_seller = request.session.get('id')
+    if not id_seller:
         return HttpResponse('Увійдіть в акаунт')
     else:
-        context = {
-            'name_items_get_edit': name_items_get_edit,
-            'description_get_edit': description_get_edit,
-            'category_get_items_edit': category_get_items_edit,        
-            'phone_get_edit': phone_get_edit,
-            'price_get_edit': price_get_edit
-        }
-        
+        find_item = Items.objects.filter(id=item_id)
+        find_seller = Registration.objects.filter(id=id_seller)
+
+        context = {'find_item': find_item.values(), 'find_seller': find_seller}
 
         if request.method == 'POST':
-            name_item_edit = request.POST['name_item_edit']
-            description_item_edit = request.POST['description_item_edit']
-            category_items_edit = request.POST['category_items_edit']
-            phone_user_edit = request.POST['phone_user_edit']
-            price_item_edit = request.POST['price_item_edit']
-            id_user = request.session.get('id')
+            name_item_edit = request.POST['name_item']
+            description_item_edit = request.POST['description_item']
+            category_items_edit = request.POST['category_items']
+            phone_user_edit = request.POST['phone_user']
+            price_item_edit = request.POST['price_item']
+            guarantee_period = request.POST['guarantee_period']
 
-            
-            item_id_get = Items.objects.filter(id=item_id).first() # витягуватой той товар який обрав користувач
-            if item_id_get and item_id_get.author_id_item == id_user: # редагувати товар той який обав користувач і належить користувачу
-                item_id_get.name_items = name_item_edit
-                item_id_get.description_items = description_item_edit
-                item_id_get.category_items = category_items_edit
-                item_id_get.phone = phone_user_edit
-                item_id_get.price = price_item_edit
 
-                item_id_get.save()
+            find_item = find_item.first()
+            if find_item:
+                find_item.name_items = name_item_edit
+                find_item.description_items = description_item_edit
+                find_item.category_items = category_items_edit
+                find_item.phone = phone_user_edit
+                find_item.price = price_item_edit
+                find_item.guarantee = guarantee_period
 
+                find_item.save()
 
                 return redirect('my_profile')
             

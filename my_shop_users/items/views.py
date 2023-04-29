@@ -36,7 +36,7 @@ def items(request):
     return render(request, 'all_items.html', context)
 
 
-#FIXME: Fix Filters, and paginator after sorting buttons, filter
+#FIXME: Fix Filters, and paginator after sorting buttons, filter    
 def item_search(request, result_item_name):
     """ 
     On the search page, with available search results, buttons, sorting, filters.
@@ -98,10 +98,10 @@ def item_search(request, result_item_name):
     return render(request, 'get_result_search.html', context_result_search)
 
 
-#TODO: поставити шифр/захист на cookie 
 #TODO: зробити, скільки потрібно замовити товару (наприклад: playstation 1, 2, 3) - і ціна змінюється
+#TODO: Добавити більше фільтрів
 def item_information(request, id, item_name):
-    """Інформації о товарі, можно переглянути відгуки, та питання до товару, добавити в коризну"""
+    """Information about item, see review, questions for item and added in shopping bussket"""
     responce = redirect('.')
 
     button_reviews = request.GET.get('button_reviews') 
@@ -118,6 +118,11 @@ def item_information(request, id, item_name):
     items_info = Items.objects.get(id=id, name_items=item_name) 
     items_info_price = items_info.price 
     items_info_description = items_info.description_items   
+    
+    state = items_info.state
+    status = items_info.status
+    guarantee = items_info.guarantee
+    phone = items_info.phone
 
     # get seller this item
     get_seller = Registration.objects.filter(id=items_info.author_id_item).values()
@@ -152,13 +157,17 @@ def item_information(request, id, item_name):
             'items_info_price': items_info_price,
             'items_info_description': items_info_description,
 
+            # info about seller
             'get_seller': get_seller,
             'id_user': request.session.get('id'),
+            'state': state,
+            'status': status,
+            'guarantee': guarantee,
+            'phone': phone,
             
             # count 
             'count_reviews_item': count_reviews_item,
             'count_questions_item': count_questions_item,
-
             'checking_item_in_bussket': checking_item_in_bussket
         }
 
@@ -177,7 +186,7 @@ def item_information(request, id, item_name):
                     "items_info_description": items_info_description,
                     "id_item": id}
                 )
-                responce.set_cookie('all_item_bussket', json.dumps(items_bussket_dict))    
+                responce.set_cookie('all_item_bussket', json.dumps(items_bussket_dict), secure=True)    
 
                 return responce
 

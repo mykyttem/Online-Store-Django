@@ -11,8 +11,8 @@ urlpatterns = [
     path('my_profile/edit-profile/', views.edit_profile, name='edit_profile'),
     path('profile/seller/<int:id>/<str:login>/', views.see_profile_seller, name='see_profile_seller'),
     
-    path('create_item/', views.create_item, name='create_item'),
-    path('edit_item', views.edit_item, name='edit_item'),
+    path('my_profile/create_item/', views.create_item, name='create_item'),
+    path('my_profile/edit_item/<int:item_id>/<str:name_items_get_edit>/', views.edit_item, name='edit_item'),
     
     path('my_orders/', orders.my_orders, name='my_orders'),
     path('my_orders-items/<int:get_id_order>/', orders.my_orders_items, name='my_orders_items'),

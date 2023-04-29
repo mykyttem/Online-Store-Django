@@ -1,51 +1,99 @@
 {% extends 'base.html' %}
 
-{% block title %}
-Edit item
+{% block title %}Edit item{% endblock %}
+
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/create_item.css'%}">
+    <script defer src="{% static 'js/create_item_check_marks.js' %}"></script>
 {% endblock %}
 
-
 {% block body %}
+<div class="left-block-profile">
 
-<form action="/edit_item" method="POST">
-    {% csrf_token %}
-    
-    <label for="posting">Назва товару</label>
-    <input type="text" name="name_item_edit" value="{{ name_items_get_edit }}" placeholder="Введіть назву товару..." required/>    
+  {% for i in find_seller %}
+    <h1>Profile</h1>
+    <hr>
+    <h2>Login: {{ i.login_user }}</h2>
+    <h2>Email: {{ i.email_user }}</h2>
+    <h2>ID: {{ i.id }}</h2>
 
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="logout_profile" value="my_profile">
+      <input type="submit" value="Вийти з профіля">
+    </form>
 
-    <div class="form-group">        
+    <br>
+    <a href="/my_orders">Подивитися мої замовлення</a>
+    <br><br>
+    <a href="/orders_my_client">Замолвення моїх клієнтів</a>
+    <br><br>
+    <a href="/my_profile/edit-profile/">Редагування акаунт</a>
+  {% endfor %}
+
+</div>
+
+<div class="create-item">
+  <form method="POST">
+      {% csrf_token %}
+      
+      {% for i in find_item %}
+        <label for="posting">Назва товару</label>
+        <input type="text" name="name_item" value="{{ i.name_items }}" placeholder="Введіть назву товару..." required/>    
+
+        <div class="form-group">        
+            <br>
+            <label for="posting">Опис товару</label>
+            <textarea class="form-control" name="description_item" id="posting" cols="60" rows="6" placeholder="Опис товару...">{{i.description_items}}</textarea>
+            
+        </div>
         <br>
-        <label for="posting">Текст посту</label>
-        <textarea class="form-control" name="description_item_edit" id="posting" cols="60" rows="6" required>{{ description_get_edit }}</textarea>
+        
+        <label for="posting">Категорія товару</label>
+        <input type="text" name="category_items" value="{{ i.category_items }}" placeholder="Введіть категорію товару..." required/>    
 
-    </div>
-    <br>
+        <br><br>
 
-    <label for="posting">Категорія товару</label>
-    <input type="text" name="category_items_edit" value="{{ category_get_items_edit }}" placeholder="Введіть категорію товару..." required/>    
+        <label for="posting">Ваш телефон, щоб клієнти могли зв'язатися з вами</label>
+        <input type="number" name="phone_user" value="{{ i.phone }}" placeholder="Введіть ваш номер телефону..." required/>    
 
-    <br>
-    <br>
+        <br><br>
 
-    <label for="posting">Ваш телефон, щоб клієнти могли зв'язатися з вами</label>
-    <input type="text" name="phone_user_edit" value="{{ phone_get_edit }}" placeholder="Введіть ваш номер телефону..." required/>    
+        <label for="posting">Ціна товара</label>
+        <input type="number" name="price_item" value="{{ i.price }}" placeholder="Введіть ціну товару..." required/>  
 
-    <br>
-    <br>
+        <br><br>
 
-    <label for="posting">Ціна товара</label>
-    <input type="text" name="price_item_edit" value="{{ price_get_edit }}" placeholder="Введіть ціну товару..." required/>  
+        <h1>Статус:</h1>
+        <label>В наявності</label>
+        <input type="checkbox" name="status_availability" id="status_availability">
 
-    <br>
-    <br>
+        <br>
 
+        <label>Готов к відправке</label>
+        <input type="checkbox" id="status_ready">
 
-    <button type="submit">Редагувати товар</button>
-    
+        <br>
+        <h1>Стан:</h1>
+        <label>Новий</label>
+        <input type="checkbox" name="state_new" id="state_new">
 
-</form>
+        <br>
 
+        <label>Вживаний</label>
+        <input type="checkbox" id="state_used">
 
-
+        <br><br>
+        <h1>Гарантія:</h1>
+        <input type="checkbox" id="checkbox_guarantee">
+        
+        <input type="number" id="guarantee_period" name="guarantee_period" style="display:none;" value="{{ i.guarantee }}" placeholder="Ведіть дні гарантії">
+        
+        <br><br>
+        
+        <button type="submit">Підтвердити</button>
+    {% endfor %}
+  </form>
+</div>
 {% endblock %}

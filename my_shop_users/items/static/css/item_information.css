@@ -7,10 +7,11 @@ body {
     width: 1000px;
     height: 800px;
     padding: 30px;
-    margin: 20px 20px 20px 220px; /* 220px - відстань від лівого краю */
+    margin: 20px 20px 20px 220px;
     border-radius: 10px;
     display: inline-block;
   }
+
 
 .information-item-block {
     background-color: #ddd;
@@ -21,5 +22,3 @@ body {
     border-radius: 10px;
     display: inline-block;
 }
-
-
