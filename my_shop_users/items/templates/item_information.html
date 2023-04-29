@@ -33,18 +33,26 @@
         <h1>{{ items_info_price }} ₴</h1>
         
         {% for seller in get_seller %}
+
             {% if seller.id == id_user %}
                 <hr>
                 <h1>Так бачать ваш товар, інші користувачі</h1>
             {% else %}
-                {% if not checking_item_in_bussket %}
+
+                {% if amount == 0 %}
+                    <h1>Немає в наявності</h1>
+                {% else %}
+
+                    {% if not checking_item_in_bussket%}
                         <form method="GET">   
                             <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
                             <input type="submit" value="Додати в кошик">
-                        </form>
+                        </form>        
                     {% else %}
                         <hr>
                         <h1>Товар добавлен в кошик ✔</h1>
+                    {% endif %}
+
                 {% endif %}
             {% endif %}
             <hr>
@@ -52,7 +60,12 @@
             <h2><a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</a></h2>
             <h2>Номер продавця: {{phone}}</h2>
             <h2>Стан: {{state}}</h2>
-            <h2>Статус: {{status}}</h2>
+
+            {% if amount > 0 %}
+                <h2>Статус: {{status}}</h2>
+            {% endif %}
+
+                        
             {% if guarantee %}
                 <h2>Гарантія: {{guarantee}} днів</h2>
             {% else %}

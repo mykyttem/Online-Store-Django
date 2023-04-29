@@ -81,7 +81,6 @@ def my_profile(request):
         logout_profile = request.POST.get('logout_profile')
         delete_item = request.POST.get('delete_item') 
 
-
         # get field from items edit
         item_id = request.POST.get('item_id')
         name_items_get_edit = request.POST.get('name_items')
@@ -186,13 +185,15 @@ def create_item(request):
             price_item = request.POST['price_item']
             guarantee = request.POST['guarantee_period']
 
+            amount_item = request.POST['amount_item']
+
             status_availability = request.POST.get('status_availability') 
             state_new = request.POST.get('state_new')
       
             date = datetime.now()
 
             new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_seller,
-                             status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=guarantee)
+                             status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=guarantee, amount_item=amount_item)
             new_item.save()
 
 
@@ -219,6 +220,7 @@ def edit_item(request, item_id, name_items_get_edit):
             phone_user_edit = request.POST['phone_user']
             price_item_edit = request.POST['price_item']
             guarantee_period = request.POST['guarantee_period']
+            amount_item = request.POST['amount_item']
 
 
             find_item = find_item.first()
@@ -229,6 +231,8 @@ def edit_item(request, item_id, name_items_get_edit):
                 find_item.phone = phone_user_edit
                 find_item.price = price_item_edit
                 find_item.guarantee = guarantee_period
+                find_item.amount_item = amount_item
+
 
                 find_item.save()
 

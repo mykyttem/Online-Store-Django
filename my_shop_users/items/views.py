@@ -123,6 +123,7 @@ def item_information(request, id, item_name):
     status = items_info.status
     guarantee = items_info.guarantee
     phone = items_info.phone
+    amount = items_info.amount_item
 
     # get seller this item
     get_seller = Registration.objects.filter(id=items_info.author_id_item).values()
@@ -168,10 +169,13 @@ def item_information(request, id, item_name):
             # count 
             'count_reviews_item': count_reviews_item,
             'count_questions_item': count_questions_item,
-            'checking_item_in_bussket': checking_item_in_bussket
+            'checking_item_in_bussket': checking_item_in_bussket,
+            
+            'amount': amount
         }
 
         
+
         if request.method == 'GET':
             if button_reviews:
                 return redirect(f'/items/{id}/{item_name}/reviews')

@@ -38,7 +38,7 @@ body {
     font-weight: bold;
   }
 
-  input[name="name_item"], input[name="description_item"], input[name="category_items"], input[name="phone_user"], input[name="price_item"], input[name="guarantee_period"], textarea[name="description_item"] {
+  input[name="name_item"], input[name="description_item"], input[name="category_items"], input[name="phone_user"], input[name="price_item"], input[name="guarantee_period"], textarea[name="description_item"], input[name="amount_item"] {
     width: 100%;
     padding: 10px;
     border: none;

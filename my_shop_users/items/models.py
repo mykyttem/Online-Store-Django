@@ -15,6 +15,8 @@ class Items(models.Model):
     state = models.CharField(max_length=255, null=True)
     guarantee = models.IntegerField(null=True)
 
+    amount_item = models.IntegerField()
+
 
 class Items_Reviews(models.Model):
     login_user_review = models.CharField(max_length=255)

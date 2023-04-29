@@ -117,13 +117,15 @@ def my_orders_items(request, get_id_order):
     return render(request, 'orders/my_orders_items.html', context)
 
 
-
 def orders_my_client(request):
     id_seller = request.session.get('id')
     if not id_seller:
         return HttpResponse('Увійдіть в кабінет')
     else:
         all_orders = Order_Items.objects.filter(authors_items__icontains=id_seller).values()
+        
+        
+        # button check items client
         if 'get_id_order' in request.GET:
             get_name_client = request.GET.get('get_name_client')
             get_id_order = request.GET.get('get_id_order')
@@ -131,13 +133,26 @@ def orders_my_client(request):
             return redirect(f'./items-cleint/{get_id_order}/{get_name_client}', get_id_order)        
 
 
+        # button confirm
         if 'get_id_order' in request.POST:
             id_order = request.POST.get('get_id_order')
             get_order = Order_Items.objects.filter(authors_items__icontains=id_seller, id=id_order).first()
 
             get_order.id_confirmed_sellers += [id_seller]
+
+
+            # delete -1 item 
+            for i in all_orders:
+                id_items = i['item_id']
+                
+                for item in Items.objects.filter(id__in=id_items, author_id_item__icontains=id_seller).all():
+                    item.amount_item -= 1
+                    item.save()
+                
+
             get_order.save()
             return redirect('.')
+        
 
         try:
             context = {
