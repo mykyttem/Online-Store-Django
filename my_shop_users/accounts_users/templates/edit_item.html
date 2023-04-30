@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit item{% endblock %}
+{% block title %}Edit item {{name_items_get_edit}}{% endblock %}
 
 {% block link %}
     {% load static %}
@@ -10,7 +10,6 @@
 
 {% block body %}
 <div class="left-block-profile">
-
   {% for i in find_seller %}
     <h1>Profile</h1>
     <hr>
@@ -31,7 +30,6 @@
     <br><br>
     <a href="/my_profile/edit-profile/">Редагування акаунт</a>
   {% endfor %}
-
 </div>
 
 <div class="create-item">
@@ -65,25 +63,23 @@
 
         <br><br>
 
-        <h1>Статус:</h1>
-        <label>В наявності</label>
-        <input type="checkbox" name="status_availability" id="status_availability">
-
+        <h1 style="display: inline-block;">Статус:</h1>
         <br>
-
-        <label>Готов к відправке</label>
-        <input type="checkbox" id="status_ready">
-
+        <label style="display: inline-block;">В наявності</label>
+        <input type="checkbox" name="status_availability" id="status_availability" style="display: inline-block;">
+  
+        <label style="display: inline-block;">Готов к відправке</label>
+        <input type="checkbox" id="status_ready" style="display: inline-block;">
+    
         <br>
         <h1>Стан:</h1>
-        <label>Новий</label>
+        <label style="display: inline-block;">Новий</label>
         <input type="checkbox" name="state_new" id="state_new">
-
-        <br>
-
-        <label>Вживаний</label>
+  
+        <label style="display: inline-block;">Вживаний</label>
         <input type="checkbox" id="state_used">
 
+        
         <br><br>
         <h1>Гарантія:</h1>
         <input type="checkbox" id="checkbox_guarantee">
@@ -94,6 +90,43 @@
         <h1>Кількість</h1>
         <input type="number" id="amount_item" name="amount_item"  value="{{ i.amount_item }}" placeholder="Скільки у вас товарів" required>
 
+        <br><br>
+
+        <h1>Промокод</h1>
+        <input type="checkbox" id="checkbox_promotion_code_edit"> 
+        
+        <input type="text" id="promotion_code_edit" name="promotion_code_edit" style="display: none;" value="{{ i.promotion_code }}" placeholder="Придумайте свій промокод">
+        <input type="text" id="at_what_price_edit" name="at_what_price_edit" style="display: none;" value="{{ i.at_what_price }}" placeholder="На яку суму знижка?">
+        <input type="number" id="amount_users_type_edit" name="amount_users_type_edit" style="display: none;" value="{{ i.amount_type_promotion_code }}" placeholder="Ведіть скільки людей може вести промокод">
+        
+        <h4 id="hint-text" style="display: none;">Ведіть дату коли закінчується дія промокода</h4>
+        <input type="datetime-local" id="validity_period_promocode_edit" name="validity_period_promocode_edit" style="display: none;"> 
+  
+
+        <script>
+          var checkbox_promotion_code_edit = document.querySelector('#checkbox_promotion_code_edit')
+          var type_promotion_code_edit = document.getElementById('promotion_code_edit')
+          var amount_users_type_edit = document.getElementById('amount_users_type_edit')
+          var at_what_price_edit = document.getElementById('at_what_price_edit')
+          var validity_period_promocode_edit = document.getElementById('validity_period_promocode_edit')
+
+          checkbox_promotion_code_edit.addEventListener('change', function() {
+            if (checkbox_promotion_code_edit.checked) {
+          
+              type_promotion_code_edit.style.display = 'block';
+              amount_users_type_edit.style.display = 'block';
+              at_what_price_edit.style.display = 'block';
+              validity_period_promocode_edit.style.display = 'block'
+            } else {
+              type_promotion_code_edit.style.display = 'none';
+              amount_users_type_edit.style.display = 'none';
+              at_what_price_edit.style.display = 'none';
+              validity_period_promocode_edit.style.display = 'none'
+          
+              document.getElementById("promotion_code_edit").value = '';
+            }
+          })
+        </script>
         <br><br>
         
         <button type="submit">Підтвердити</button>

@@ -18,7 +18,12 @@
         <ul>
             <h1>Вас звати: {{my_order.client_name}}</h1>
             <h2>Ваши дані замовлення</h2>
-
+            
+            {% if my_order.order_amount_use_promotion_code > 0 or None%}
+                <h1>Загальна сума замовлення: {{ my_order.order_amount }}</h1>
+                <h1>Ціна зі знижкою {{my_order.discount}}%: {{my_order.order_amount_use_promotion_code}}</h1>
+            {% endif %}
+            
             <li><strong>Номер:</strong> {{ my_order.client_number }}</li>
             <li><strong>Email:</strong> {{my_order.client_email}}</li>
             {% if my_order.payment_upon_receipt == True %}

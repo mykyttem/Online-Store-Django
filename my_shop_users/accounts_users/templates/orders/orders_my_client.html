@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}
-Замовлення моїх клієнтів
-{% endblock %}
+{% block title %}Замовлення моїх клієнтів{% endblock %}
+
 
 {% block link %}
     {% load static %}
@@ -19,6 +18,11 @@
             <h1>Замовлення від {{order.client_name}}</h1>
             <h2>Дані користувача</h2>
 
+            {% if order.order_amount_use_promotion_code > 0 or None%}
+                <h1>Загальна сума замовлення: {{ order.order_amount }}</h1>
+                <h1>Ціна зі знижкою {{order.discount}}%: {{order.order_amount_use_promotion_code}}</h1>
+            {% endif %}
+            
             <li><strong>Номер:</strong> {{ order.client_number }}</li>
             <li><strong>Email:</strong> {{order.client_email}}</li>
             {% if order.payment_upon_receipt == True %}

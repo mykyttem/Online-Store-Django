@@ -83,7 +83,7 @@ def my_profile(request):
 
         # get field from items edit
         item_id = request.POST.get('item_id')
-        name_items_get_edit = request.POST.get('name_items')
+        name_items_get_edit = request.POST.get('name_items_get_edit')
     
         myitems = Items.objects.filter(author_id_item=id_user).values 
     
@@ -185,16 +185,23 @@ def create_item(request):
             price_item = request.POST['price_item']
           
             amount_item = request.POST['amount_item']
+
+            # promotion code
+            promotion_code = request.POST['promotion_code']
+            amount_users_type = request.POST['amount_users_type']
             guarantee = request.POST['guarantee_period']
+            at_what_price = request.POST['at_what_price']
+            validity_period_promocode = request.POST['validity_period_promocode']
 
             status_availability = request.POST.get('status_availability') 
             state_new = request.POST.get('state_new')
       
+      
             date = datetime.now()
-        
-
+           
             new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_seller,
-                             status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=None if guarantee == '' else guarantee, amount_item=amount_item)
+                             status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=None if guarantee == '' else guarantee, amount_item=amount_item,
+                             promotion_code=None if promotion_code == '' else promotion_code, amount_type_promotion_code=None if amount_users_type == '' else amount_users_type, at_what_price=None if at_what_price == '' else at_what_price, validity_period_promocode=validity_period_promocode)
             new_item.save()
 
 
@@ -212,7 +219,10 @@ def edit_item(request, item_id, name_items_get_edit):
         find_item = Items.objects.filter(id=item_id)
         find_seller = Registration.objects.filter(id=id_seller)
 
-        context = {'find_item': find_item.values(), 'find_seller': find_seller}
+        context = {'find_item': find_item.values(), 
+                   'find_seller': find_seller, 
+                   'name_items_get_edit': name_items_get_edit
+                }
         
         old_price = [i['price'] for i in find_item.values()]          
 
@@ -224,7 +234,13 @@ def edit_item(request, item_id, name_items_get_edit):
             price_item_edit = request.POST['price_item']
             guarantee_period = request.POST['guarantee_period']
             amount_item = request.POST['amount_item']
-            
+
+            # promotion code
+            promotion_code_edit = request.POST['promotion_code_edit']
+            amount_users_type_edit = request.POST['amount_users_type_edit']
+            at_what_price_edit = request.POST['at_what_price_edit']
+            validity_period_promocode_edit = request.POST['validity_period_promocode_edit']
+
 
             find_item = find_item.first()
             if find_item:
@@ -236,9 +252,14 @@ def edit_item(request, item_id, name_items_get_edit):
                 find_item.phone = phone_user_edit
                 find_item.price = price_item_edit
 
-                find_item.guarantee = guarantee_period
+                find_item.guarantee = None if guarantee_period == '' else guarantee_period
                 find_item.amount_item = amount_item
 
+                find_item.promotion_code = promotion_code_edit
+                find_item.amount_item = amount_users_type_edit
+                find_item.at_what_price = at_what_price_edit
+                find_item.validity_period_promocode = validity_period_promocode_edit
+                
 
                 for old in old_price:
                     find_item.old_price = old

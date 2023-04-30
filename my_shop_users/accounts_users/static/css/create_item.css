@@ -20,7 +20,6 @@ body {
     max-width: 600px;
     margin: 0 auto;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  
   }
 
   #create_item {
@@ -38,7 +37,11 @@ body {
     font-weight: bold;
   }
 
-  input[name="name_item"], input[name="description_item"], input[name="category_items"], input[name="phone_user"], input[name="price_item"], input[name="guarantee_period"], textarea[name="description_item"], input[name="amount_item"] {
+  input[name="name_item"], input[name="description_item"], input[name="category_items"], 
+  input[name="phone_user"], input[name="price_item"], 
+  input[name="guarantee_period"], textarea[name="description_item"], 
+  input[name="amount_item"], input[name="promotion_code"], input[name="amount_users_type"], input[name="at_what_price"],
+  input[name="promotion_code_edit"], input[name="at_what_price_edit"], input[name="amount_users_type_edit"], input[name="validity_period_promocode"] {
     width: 100%;
     padding: 10px;
     border: none;

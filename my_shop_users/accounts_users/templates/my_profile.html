@@ -43,6 +43,7 @@
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="item_id" value="{{ x.id }}">
+                <input type="hidden" name="name_items_get_edit" value="{{ x.name_items }}">
                 <input type="submit" value="Edit item">
             </form>
     
@@ -61,6 +62,7 @@
             {% if x.old_price < x.price or x.old_price == None %}
                 <h4> {{ x.price }} </h4>
                 
+                <h4>Кількість ведених ваших промокодів: {{x.purchaser_type_code|length }}</h4>
             {% else %}
                 <h4><s>{{ x.old_price }}</s></h4>
                 <h4>Знижка: {{x.discount}}%</h4>

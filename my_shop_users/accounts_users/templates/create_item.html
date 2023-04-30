@@ -35,7 +35,7 @@
 </div>
 
 <div class="create-item">
-  <form method="POST">
+  <form id="form-create-item" method="POST">
       {% csrf_token %}
       
       <label for="posting">Назва товару</label>
@@ -64,23 +64,22 @@
 
       <br><br>
 
-      <h1>Статус:</h1>
-      <label>В наявності</label>
-      <input type="checkbox" name="status_availability" id="status_availability">
-
+    
+      <h1 style="display: inline-block;">Статус:</h1>
       <br>
+      <label style="display: inline-block;">В наявності</label>
+      <input type="checkbox" name="status_availability" id="status_availability" style="display: inline-block;">
 
-      <label>Готов к відправке</label>
-      <input type="checkbox" id="status_ready">
-
+      <label style="display: inline-block;">Готов к відправке</label>
+      <input type="checkbox" id="status_ready" style="display: inline-block;">
+  
+    
       <br>
       <h1>Стан:</h1>
-      <label>Новий</label>
+      <label style="display: inline-block;">Новий</label>
       <input type="checkbox" name="state_new" id="state_new">
 
-      <br>
-
-      <label>Вживаний</label>
+      <label style="display: inline-block;">Вживаний</label>
       <input type="checkbox" id="state_used">
 
       <br><br>
@@ -93,6 +92,17 @@
 
       <h1>Кількість</h1>
       <input type="number" id="amount_item" name="amount_item" placeholder="Скільки у вас товарів" required>
+
+      <br><br>
+      <h1>Промокод</h1>
+      <input type="checkbox" id="checkbox_promotion_code"> 
+      
+      <input type="text" id="promotion_code" name="promotion_code" style="display: none;" placeholder="Придумайте свій промокод">
+      <input type="text" id="at_what_price" name="at_what_price" style="display: none;" placeholder="На яку суму знижка?">
+      <input type="number" id="amount_users_type" name="amount_users_type" style="display: none;" placeholder="Ведіть скільки людей може вести промокод">
+
+      <h4 id="hint-text" style="display: none;">Ведіть дату коли закінчується дія промокода</h4>
+      <input type="datetime-local" id="validity_period_promocode" name="validity_period_promocode" style="display: none;"> 
 
       <br><br>
 

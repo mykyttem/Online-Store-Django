@@ -7,7 +7,7 @@ class Items(models.Model):
     category_items = models.CharField(max_length=255)
 
     phone = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=0)
+    price = models.IntegerField()
     joined_date = models.DateField()
     author_id_item = models.IntegerField()
 
@@ -20,6 +20,13 @@ class Items(models.Model):
     # old price
     old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+
+    # promotion code
+    promotion_code = models.CharField(max_length=15, null=True)
+    amount_type_promotion_code = models.IntegerField(null=True)
+    purchaser_type_code = models.JSONField(default=[])
+    at_what_price = models.IntegerField(null=True)
+    validity_period_promocode = models.DateTimeField(null=True)
 
 
 class Items_Reviews(models.Model):
