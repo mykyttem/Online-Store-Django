@@ -5,15 +5,19 @@
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/my_orders.css'%}">
+    <link rel="stylesheet" href="{% static 'css/checkout.css'%}">
 {% endblock %}
 
-{% block body %}
+{% block body %}             
+<script defer src="{% static 'js/check_marks.js' %}"></script>
+
 <h1>Мої замовлення</h1>
 <hr>
 {{ not_order_error|safe }}
 
 {% for my_order in search_my_orders %}
     <div class="block-order">        
+        <h1 stlye="font-display: bont;">Номер замовлення №{{my_order.id}}</h1>
         <h1 style="font-display: bont;"><b>Статус замовлення: {{my_order.status_order}}</b></h1>
         <ul>
             <h1>Вас звати: {{my_order.client_name}}</h1>
@@ -32,18 +36,18 @@
                 <li><strong>Оплата:</strong>Онлайн</li>
             {% endif %}
 
-            <h2>Отримувач: </h2>
+            <h1>Отримувач:</h1>
             {% if my_order.I_receiver == True %}
-                <h2>Я</h2>
+                <h2 style="border-bottom: 2px solid rgb(0, 0, 0);">Я</h2>
             {% else %}
-                <h2>Інша людина</h2>
+                <h2 style="border-bottom: 2px solid rgb(0, 0, 0);">Інша людина</h2>
             {% endif %}
 
-            <h2>Дзвінок:</h2>
+            <h1>Дзвінок:</h1>
             {% if my_order.do_not_call_me_back == True %}
-                <h2>Перездвонити</h2>
+                <h2 style="border-bottom: 2px solid rgb(0, 0, 0);">Перездвонити</h2>
             {% else %}
-                <h2>Не передзванювати</h2>
+                <h2 style="border-bottom: 2px solid rgb(0, 0, 0);">Не передзванювати</h2>
             {% endif %}
 
             <br>
@@ -51,6 +55,61 @@
                 <input type="hidden" name="get_id_order" value="{{ my_order.id }}"/>
                 <button type="submit">Подивитися мої замовлені товари</button>
             </form>         
+            <br>
+
+            {% if my_order.status_order != 'Підтвердежено' %}
+                <button id="openModal" onClick="openModal()">Редагувати дані</button>
+
+                <!-- Edit data -->
+                <div id="editModal" class="modal">   
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h1 style="text-align: center">Вкажть контактну інформацію</h1>
+
+                        <form id="form-checkout" method="POST">
+                            {% csrf_token %}
+                            <input type="number" name="your_number" value="{{ my_order.client_number }}" placeholder="Ваш телефон" required>
+                            <input type="text" name="your_name" value="{{ my_order.client_name }}" placeholder="Ім'я" required>
+                            <input type="text" name="your_surname" value="{{ my_order.client_username }}" placeholder="Прізвище" required>
+                            <input type="email" name="your_email" value="{{ my_order.client_email }}" placeholder="email" required>
+                            
+                            <br><br>
+                            
+                            {% for msg in messages %}
+                                <h2 style="color:rgb(220, 20, 20); font:bold">{{ msg }}</h2>
+                            {% endfor %}
+                            <br>
+                            <h1 style="text-align: center">Оплата</h1>
+                            
+                            <h3>Оплата при отримані</h3>
+                            <input type="checkbox" name="payment_upon_receipt" id="payment_upon_receipt_checkbox">
+                        
+                            <h3>Онлайн</h3>
+                            <input type="checkbox" name="online_payment" id="online_payment_checkbox">
+                        
+                            <h1 style="text-align: center">Отримувач</h1>
+                                <h3>Я</h3>
+                                <input type="checkbox" name="I_receiver" id="i_receiver_checkbox">
+                            
+                                <h3>Інша людина</h3>
+                                <input type="checkbox" name="other_person" id="other_person_checkbox">
+                                
+                                <h3>Мені не передзванювати</h3>
+                                <input type="checkbox" name="do_not_call_me_back">
+                                
+                            <button type="submit" name="confirm-order">Підтвердити замовлення</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <script>
+                    function openModal() {
+                    var modal = document.getElementById("editModal");
+                    modal.style.display = "block";
+                    }
+                </script>
+             
+            {% endif %}
         </ul>
     </div>
 {% endfor %}

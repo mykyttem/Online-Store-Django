@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
+
+from django.core.mail import send_mail
 
 from items.models import Items
 from client_service.models import Order_Items
-
-from django.http import HttpResponse
 
 
 def my_orders(request):
@@ -40,24 +41,83 @@ def my_orders(request):
             count_sellers = len(list_id_sellers)
             cout_confirmed = len(list_confirmed)
 
+            
+            change_data_order = search_my_orders.first()
 
-            if count_sellers == cout_confirmed:
-                update_status_order = search_my_orders.first()
+            if count_sellers == cout_confirmed and change_data_order.status_order != 'Підтвердежено':
+                # change status order
+                change_data_order.status_order = 'Підтвердежено'
 
-                update_status_order.status_order = 'Підтвердежено'
-                update_status_order.save()
+                # send email
+                try:
+                    for i in search_my_orders.values():
+                        id = i['id']
+                        name = i['client_name']
+                        order_amount = i['order_amount']
+
+                        send_mail(
+                            f'Номер замовлення: №{id}, Статус: Відправлено', # subject
+
+                            # message
+                            f"""
+                            Дякуємо за ваше замовлення!\n
+                            Ваша заявка №{id}\n
+                            Ви можете дивитися статус замовлення у своєму кабінеті\n
+                            Покупець: {name}\n
+                            Загальна сума замовлення {order_amount}
+                            """,
+
+                            i['client_email'], # To Email
+                            ['site@gmail.com'], # from email
+                        )
+                except ConnectionRefusedError:
+                    print('Error, you need to configure the email in the settings')
+
+
+                change_data_order.save()
+
+           
+            # edit order
+            if request.method == 'POST':
+                number_edit = request.POST['your_number']
+                name_edit = request.POST['your_name']
+                surname_edit = request.POST['your_surname']
+                email_edit = request.POST['your_email']
+
+                # payment
+                payment_upon_receipt_edit = request.POST.get('payment_upon_receipt')
+                online_payment_edit = request.POST.get('online_payment')
+
+                # person
+                I_receiver_edit = request.POST.get('I_receiver')
+                other_person_edit = request.POST.get('other_person')
+
+                # callback
+                do_not_call_me_back_edit = request.POST.get('do_not_call_me_back')
+
+                # save
+                change_data_order.client_number = number_edit
+                change_data_order.client_name = name_edit
+                change_data_order.client_username = surname_edit
+                change_data_order.client_email = email_edit
                 
-        not_order_error = '<h1>У вас немає замовлень</h1>'
-        if not search_my_orders:
-            context = {
-                'search_my_orders': search_my_orders.values(),
-                'not_order_error': not_order_error,
-            }
-        else:
-            context = {
-                'search_my_orders': search_my_orders.values(),
-            }
+                change_data_order.payment_upon_receipt = True if payment_upon_receipt_edit == 'on' else False
+                change_data_order.online_payment = True if online_payment_edit == 'on' else False
 
+                change_data_order.I_receiver = True if I_receiver_edit == 'on' else False
+                change_data_order.other_person = True if other_person_edit == 'on' else False
+
+                change_data_order.do_not_call_me_back = True if do_not_call_me_back_edit == 'on' else True
+               
+
+                change_data_order.save()
+                return redirect('.')
+
+
+        if not search_my_orders:
+            context = {'not_order_error': '<h1>У вас немає замовлень</h1>'}
+        else:
+            context = {'search_my_orders': search_my_orders.values()}
                 
     return render(request, 'orders/my_orders.html', context)
 
