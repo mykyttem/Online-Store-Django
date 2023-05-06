@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 
-
 {% block title %}{{ name_items }}{% endblock %}
 
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/item_information.css'%}">
 {% endblock %}
-
 
 {% block body %}
 <br>
@@ -56,8 +54,15 @@
                 {% endif %}
             {% endif %}
             <hr>
-        
-            <h2><a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</a></h2>
+            
+            {% if not seller.id == id_user %}
+                <h2><a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</a></h2>
+            
+                <input type="hidden" name="name_room_chat" id="room-name-input" value="idSeller_{{ seller.id }}_idUser_{{ id_user }}"><br>
+                <input id="room-name-submit" type="button" value="Зв'язатися з продавцем" onclick="btnWrite()">
+            {% endif %}     
+
+            
             <h2>Номер продавця: {{phone}}</h2>
             <h2>Стан: {{state}}</h2>
 
@@ -76,4 +81,16 @@
     <h1 style="text-align: center;">Опис</h1>
     <h1>{{ items_info_description }}</h1>
 </div>
+
+<script>
+    function btnWrite() {
+        if ("{{ id_user }}" == 'None') {
+            window.location.replace('/sign_in');
+        } else {
+            var roomName = document.querySelector('#room-name-input').value;
+            window.location.pathname = '/chat/' + roomName + '/';
+        }
+    }
+</script>
+
 {% endblock %}

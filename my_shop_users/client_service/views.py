@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 
-from .models import Order_Items
+from accounts_users.models import Registration
+from .models import Order_Items, Chat_UserSeller, MessageChat
 from items.models import Items
 
 from django.contrib import messages
@@ -156,3 +157,49 @@ def checkout(request):
         
 
     return render(request, 'checkout.html', context)
+
+
+def room(request, room_name):
+    id_user = request.session.get('id')
+
+    if not id_user:
+        return redirect('/items')    
+
+
+    # get data from url 
+    get_channels = Chat_UserSeller.objects.filter(name_channel=room_name).values()
+    get_messages_channels = MessageChat.objects.filter(chat=room_name).values()
+    
+    id_seller = room_name.replace('_', ' ').split()[1]
+    id_buyer = room_name.replace('_', ' ').split()[3]
+
+
+    # checking if user is a member of the chat
+    if (id_user == int(id_buyer)) or (id_user == int(id_seller)):
+
+        # checking person in chat
+        if not id_user == int(id_buyer):
+            search_interlocutor = Registration.objects.filter(id=id_buyer).values()
+        else:
+            search_interlocutor = Registration.objects.filter(id=id_seller).values()
+            
+    
+        if not get_channels:
+
+            # save room     
+            Chat_UserSell = Chat_UserSeller(name_channel=room_name, id_buyer=id_buyer, id_seller=id_seller)
+            Chat_UserSell.save()
+        
+        
+        context =  {
+            'room_name': room_name,
+            'messages': get_messages_channels,
+            'name_interlocutor': search_interlocutor,
+            'id_user': id_user
+        }
+
+    else:
+        return redirect('/items')
+
+
+    return render(request, "channel_chat.html", context)

@@ -29,3 +29,18 @@ class Order_Items(models.Model):
     order_amount = models.DecimalField(max_digits=10, decimal_places=2)
     order_amount_use_promotion_code = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Chat_UserSeller(models.Model):
+    name_channel = models.TextField()
+
+    id_buyer = models.IntegerField()
+    id_seller = models.IntegerField()
+
+
+class MessageChat(models.Model):
+    chat = models.TextField()
+    id_author = models.IntegerField()
+
+    message = models.TextField()
+    time_message = models.DateTimeField(auto_now_add=True) 

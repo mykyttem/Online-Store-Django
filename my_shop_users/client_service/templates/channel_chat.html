@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Room{% endblock %}
+
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/channel_chat.css'%}">
+{% endblock %}
+
+{% block body %}
+
+<section class="msger">
+    <header class="msger-header">
+        <div class="msger-header-options">
+            <br>
+            <br>
+            {% for i in name_interlocutor %}
+                <h1>{{i.login_user}}</h1>
+            {% endfor %}
+        </div>
+    </header>
+
+    <div class="msger-chat" id="chat-log">
+    
+        {% for msg in messages %}
+            {% if msg.id_author == id_user %}
+                <div class="msg right-msg">
+                    <div class="msg-bubble">
+                        
+                        
+                        <h4>{{ msg.message }}</h4>
+                        <h4 id="time_date">{{msg.time_message}}</h4>
+
+                    </div>
+                </div>
+            {% else %}
+                <div class="msg left-msg">
+                    <div class="msg-bubble">
+                        
+                        <h4>{{ msg.message }}</h4>
+                        <h4 id="time_date">{{msg.time_message}}</h4>
+
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+  
+    <form class="msger-inputarea">
+        <textarea id="chat-message-input" type="text" size="100" style="resize: none;" placeholder="Ведіть повідомлення"></textarea>
+        <button type="submit" id="chat-message-submit" class="msger-send-btn">Надіслати</button>
+    </form>
+</section>
+  
+
+{{ room_name|json_script:"room-name" }}
+<script>
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+    // url
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + roomName
+        + '/'   
+    );
+      
+
+    // added message in chat
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);       
+        const id_author = data.id_author; 
+    
+        var msgTag = document.createElement('div');
+        var msgBubbleTag = document.createElement('div');  
+        var h4Tag = document.createElement('h4');   
+      
+    
+        msgBubbleTag.className = 'msg-bubble';
+        msgTag.appendChild(msgBubbleTag);
+    
+        if (id_author == "{{ request.session.id }}") {
+            msgTag.className = 'msg right-msg';
+            
+            const date = new Date();
+            h4Tag.textContent = data.message;    
+
+            msgBubbleTag.appendChild(h4Tag);
+            msgTag.appendChild(msgBubbleTag);
+        } else {
+            msgTag.className = 'msg left-msg';
+            h4Tag.textContent = data.message;
+            msgBubbleTag.textContent = data.message; 
+            
+        }
+       
+        document.querySelector('#chat-log').appendChild(msgTag);
+    
+
+        var objDiv = document.getElementById("chat-log");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    };
+    
+
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        // don't reload page
+        event.preventDefault(); 
+
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+        
+        }));
+        messageInputDom.value = '';
+    };
+
+    // auto scroll down
+    
+    window.onload = function() {
+        const chatLog = document.getElementById('chat-log');
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+</script>
+
+
+{% endblock %}
