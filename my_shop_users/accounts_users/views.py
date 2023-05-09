@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 
 from .models import Registration
 from items.models import Items
+from client_service.models import Chat_UserSeller, MessageChat
+
+from django.db.models import Q
 
 from django.http import HttpResponse
 
@@ -10,13 +13,13 @@ from django.contrib.auth.hashers import make_password, check_password
 
 from datetime import datetime 
 
-
 #TODO: добавити більше даних для користувача
-def accounts_users(request):
+def registration(request):
     if request.method == 'POST':
         login_user = request.POST['login']
         email_user = request.POST['email']
         password_user = request.POST['password']
+        avatar_user = request.FILES.get('avatar') 
 
         # hashed password
         hashed_password = make_password(password_user)
@@ -35,7 +38,10 @@ def accounts_users(request):
         if search_email_dublicate or search_login_dublicate:
             messages.success(request, "Така пошта все зарегестрована")
         else:
-            new_account = Registration(login_user=login_user, email_user=email_user, password_user=hashed_password)
+            if avatar_user:
+                new_account = Registration(login_user=login_user, email_user=email_user, password_user=hashed_password, avatar_user=avatar_user)
+            else:
+                new_account = Registration(login_user=login_user, email_user=email_user, password_user=hashed_password)
             new_account.save()
             return redirect('sign_in')
 
@@ -74,8 +80,7 @@ def my_profile(request):
     if not id_user:
         return HttpResponse('Ви забули увійти в аккаунт')
     else:
-        login_user = request.session.get('login')
-        email_user = request.session.get('email')
+        account = Registration.objects.filter(id=id_user).values()
 
         # button
         logout_profile = request.POST.get('logout_profile')
@@ -85,12 +90,11 @@ def my_profile(request):
         item_id = request.POST.get('item_id')
         name_items_get_edit = request.POST.get('name_items_get_edit')
     
-        myitems = Items.objects.filter(author_id_item=id_user).values 
+        myitems = Items.objects.filter(author_id_item=id_user).values() 
     
+
         context = {
-            'login_user': login_user,
-            'email_user': email_user,    
-            'id_user': id_user,
+            'account': account,
             'myitems': myitems
             }
 
@@ -129,19 +133,26 @@ def edit_profile(request):
 
             actual_password = request.POST['actual_password']
             edit_password_confirm = request.POST['password_confirm']
-            
+            edit_avatar = request.FILES.get('edit_avatar') 
+
             edit_account = Registration.objects.get(id=id_user)
             for i in user_account:
                 if edit_account:
-                    hashed_password = make_password(edit_password_confirm)
 
                     edit_account.login_user = edit_login
                     edit_account.email_user = edit_email
-                    edit_account.password_user = hashed_password
+
+                    # checking edit to empty field or None
+                    edit_account.password_user = make_password(actual_password) if edit_password_confirm == '' else make_password(edit_password_confirm)
+                    if not edit_avatar == None:
+                        edit_account.avatar_user = edit_avatar
+
                     
                     if check_password(actual_password, i['password_user']):
                         edit_account.save()
+                        request.session.flush()
                         messages.success(request, 'Увійдіть знову, для оновлення даних у профілі')
+
                         return redirect('sign_in')
                     elif len(edit_login) < 3:
                         messages.success(request, "Короткий логін")
@@ -157,13 +168,38 @@ def edit_profile(request):
     return render(request, 'edit_profile.html', context)
 
 
+
+def my_chats(request, id):
+    # parameter "id" - get from sesion
+    if not id:
+        return redirect('/items')
+
+
+    # get data from url 
+    chats = Chat_UserSeller.objects.filter(Q(id_buyer=id) | Q(id_seller=id)).values()  
+    messages_chats = MessageChat.objects.values()
+    
+    search_interlocutor = Registration.objects.all()  
+    
+
+    context = {
+        'chats': chats, 
+        'message': messages_chats,
+        'interlocutor': search_interlocutor, 
+        'my_id': id
+    }
+
+
+    return render(request, 'my_chats.html', context)
+
+
 def see_profile_seller(request, id, login):
     items_seller = Items.objects.filter(author_id_item=id).values()        
 
     context = {
         'id': id,
         'login': login,
-        'items_seller': items_seller
+        'items_seller': items_seller,
     }
 
     return render(request, 'profile_seller.html', context)

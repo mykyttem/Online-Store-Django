@@ -20,7 +20,9 @@
     }    
 </style>
 
+<img id="avatar" src="/media/{{ x.avatar_user }}" width="100" height="100" alt="sunil"> 
 <h1>Продавець {{login}}</h1>
+
 
 {% for x in items_seller %}      
     <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">

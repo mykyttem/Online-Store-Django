@@ -1,27 +1,74 @@
 {% extends 'base.html' %}
 
-{% block title %}Room{% endblock %}
+{% block title %} Chat {% endblock %}
 
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/channel_chat.css'%}">
+    <link rel="stylesheet" href="{% static 'css/my_chats.css'%}">
 {% endblock %}
 
 {% block body %}
 
+<div class="inbox_people">
+    <div class="inbox_chat">
+
+    {% for chat in chats %}
+        <div class="chat_list">
+            <div class="chat_people" onclick="window.location.href='/chat/{{ chat.name_channel }}'" style="cursor: pointer;">
+            <div class="chat_ib">   
+                
+                <!-- List chats -->
+                {% for users in interlocutor %}
+                    {% if users.id == chat.id_seller and chat.id_buyer == my_id %}
+                        <div class="chat_img"> <img id="avatar" src="/media/{{ users.avatar_user }}" alt="sunil"> </div>
+                        <h5>{{users.login_user}}</h5>
+                    
+            
+                        {% for msg in message %}
+                            {% if msg.chat == chat.name_channel %}
+                                {% if forloop.last %}
+                                    <p>{{msg.message}}</p>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+
+                    
+                    {% elif users.id == chat.id_buyer and chat.id_buyer != my_id %}
+                        <h1>{{users.login_user}}</h1>
+                        <div class="chat_img"> <img id="avatar" src="/media/{{ users.avatar_user }}" alt="sunil"> </div>
+                
+                        {% for msg in message %}
+                            {% if msg.chat == chat.name_channel %}
+                                {% if forloop.last %}
+                                    <p>{{msg.message}}</p>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </div></div>
+        </div>  
+    {% endfor %}
+    </div>
+</div>
+
+
+<!-- Chat -->
 <section class="msger">
     <header class="msger-header">
         <div class="msger-header-options">
             <br>
             <br>
             {% for i in name_interlocutor %}
+                <div class="chat_img"> <img id="avatar" src="/media/{{ i.avatar_user }}" alt="sunil"> </div>
                 <h1>{{i.login_user}}</h1>
             {% endfor %}
         </div>
     </header>
 
     <div class="msger-chat" id="chat-log">
-    
         {% for msg in messages %}
             {% if msg.id_author == id_user %}
                 <div class="msg right-msg">
@@ -43,15 +90,15 @@
                     </div>
                 </div>
             {% endif %}
-        {% endfor %}
+        {% endfor %}    
     </div>
   
     <form class="msger-inputarea">
         <textarea id="chat-message-input" type="text" size="100" style="resize: none;" placeholder="Ведіть повідомлення"></textarea>
         <button type="submit" id="chat-message-submit" class="msger-send-btn">Надіслати</button>
     </form>
-</section>
-  
+</section>  
+
 
 {{ room_name|json_script:"room-name" }}
 <script>
@@ -132,12 +179,10 @@
     };
 
     // auto scroll down
-    
     window.onload = function() {
         const chatLog = document.getElementById('chat-log');
         chatLog.scrollTop = chatLog.scrollHeight;
       }
 </script>
-
 
 {% endblock %}

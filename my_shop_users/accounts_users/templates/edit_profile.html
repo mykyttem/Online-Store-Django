@@ -7,12 +7,20 @@
 <hr>
 
 {% for user in user_account %}
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     {% for msg in messages %}
         <h2>{{msg}}</h2> 
     {% endfor %}
+    <img src="/media/{{ user.avatar_user }}" width="200" height="200" alt="Avatar">
+
+    <br>
+    <br>
+    <input type="file" accept="image/" name="edit_avatar">
+
+    <br>
+    <br>
 
     <label>Логін: </label>
     <input type="text" name="edit_login" value="{{ user.login_user }}" placeholder="Ведіть новий логін">
@@ -29,12 +37,12 @@
     <br><br>
     
     <label>Новий пароль: </label>
-    <input type="password" id="edit_password" name="edit_password" placeholder="Введіть новий пароль" required>
+    <input type="password" id="edit_password" name="edit_password" placeholder="Введіть новий пароль">
     <button type="button" onclick="togglePasswordVisibility('edit_password')">Показати пароль</button>
     <br><br>
     
     <label>Підтвердіть новий пароль: </label>
-    <input type="password" id="password_confirm" name="password_confirm" placeholder="Підтвердіть новий пароль" required>
+    <input type="password" id="password_confirm" name="password_confirm" placeholder="Підтвердіть новий пароль">
     <button type="button" onclick="togglePasswordVisibility('password_confirm')">Показати пароль</button>
     <br><br>
     

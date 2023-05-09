@@ -9,33 +9,40 @@
 
 
 {% block body %}
-<div class="profile" >
-    <h1>Profile</h1>
-    <hr>
-    <h2>Login: {{ login_user }}</h2>
-    <h2>Email: {{ email_user }}</h2>
-    <h2>ID: {{ id_user }}</h2>
+{% for user in account %}
+    <div class="profile">  
+        <img src="/media/{{ user.avatar_user }}" width="200" height="200" alt="Avatar">
+      
+        <br>
+    
+        <h2>Login: {{ user.login_user }}</h2>
+        <h2>Email: {{ user.email_user }}</h2>
+        <h2>ID: {{ user.id }}</h2>
 
-    <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="logout_profile" value="my_profile">
-        <input type="submit" value="Вийти з профіля">
-    </form>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="logout_profile" value="my_profile">
+            <input type="submit" value="Вийти з профіля">
+        </form>
 
-    <br>
-    <a href="./create_item/">Створити товар</a>
+        <br>
+        <a href="./create_item/">Створити товар</a>
 
-    <br><br>
-    <a href="/my_orders">Подивитися мої замовлення</a>
+        <br><br>
+        <a href="/my_orders">Подивитися мої замовлення</a>
 
-    <br><br>
-    <a href="/orders_my_client">Замолвення моїх клієнтів</a>
+        <br><br>
+        <a href="/orders_my_client">Замолвення моїх клієнтів</a>
 
-    <br><br>
+        <br><br>
 
-    <a href="/my_profile/edit-profile/">Редагування акаунт</a>
-</div>
+        <a href="/my_profile/edit-profile/">Редагування акаунт</a>
 
+        <br><br>
+
+        <a href="/my_profile/my-chats/{{ user.id }}">Мої чати</a>
+    </div>
+{% endfor %}
 
 {% for x in myitems %}      
     <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
@@ -72,6 +79,6 @@
 
         </ul>
     </div>
-{% endfor %}  
 
+{% endfor %}  
 {% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %} My Chats {% endblock %}
+
+{% block link %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/my_chats.css'%}">
+{% endblock %}
+
+{% block body %}    
+
+<div class="inbox_msg">
+    <div class="inbox_people">
+        <div class="inbox_chat">
+
+        {% for chat in chats %}
+            <div class="chat_list">
+                <div class="chat_people" onclick="window.location.href='/chat/{{ chat.name_channel }}'" style="cursor: pointer;">
+                <div class="chat_ib">   
+                    
+                    <!-- List chats -->
+                    {% for users in interlocutor %}
+                        {% if users.id == chat.id_seller and chat.id_buyer == my_id %}
+                            <div class="chat_img"> <img id="avatar" src="/media/{{ users.avatar_user }}" alt="sunil"> </div> 
+                            <h5>{{users.login_user}}</h5>
+                            
+                           
+                            {% for msg in message %}
+                                {% if msg.chat == chat.name_channel and msg.id_author == my_id %}
+                                    {% if forloop.last %}
+
+                                        <p>Ти: {{msg.message}}</p>
+                                        
+                                    {% endif %}
+
+                                {% else %}
+                                
+                                    {% if forloop.last %}
+                                        
+                                        <p>{{msg.message}}</p> 
+                                        
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                          
+    
+                        {% elif users.id == chat.id_buyer and chat.id_buyer != my_id %}
+                            <h5>{{users.login_user}}</h5>                                      
+                    
+                            {% for msg in message %}
+                                {% if msg.chat == chat.name_channel %}
+                                    {% if forloop.last %}
+                                    
+                                        <p>Ти: {{msg.message}}</p>
+
+                                    {% endif %}
+                                {% else %}
+                                    {% if forloop.last %}
+
+                                        <p>Ти: {{msg.message}}</p>
+
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </div></div>
+            </div>  
+        {% endfor %}
+        </div>
+    </div>             
+</div>
+
+{% endblock %}

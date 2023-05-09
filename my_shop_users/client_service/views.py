@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.db.models import Q
 
 from accounts_users.models import Registration
 from .models import Order_Items, Chat_UserSeller, MessageChat
@@ -190,12 +191,20 @@ def room(request, room_name):
             Chat_UserSell = Chat_UserSeller(name_channel=room_name, id_buyer=id_buyer, id_seller=id_seller)
             Chat_UserSell.save()
         
+
+        chats = Chat_UserSeller.objects.filter(Q(id_buyer=id_user) | Q(id_seller=id_user)).values()  
+        messages_chats = MessageChat.objects.values() 
+        search_list_chat = Registration.objects.all()  
+        
         
         context =  {
             'room_name': room_name,
             'messages': get_messages_channels,
             'name_interlocutor': search_interlocutor,
-            'id_user': id_user
+            'id_user': id_user,
+            'chats': chats,
+            'message': messages_chats,
+            'interlocutor': search_list_chat, 
         }
 
     else:

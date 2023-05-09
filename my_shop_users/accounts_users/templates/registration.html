@@ -10,7 +10,7 @@
 {% block body %}
     <h1 style="display: flex">Зарегеструватися</h1>
     <div class="registration-form">
-        <form action="/registration/" method="POST">
+        <form action="/registration/" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {% for msg in messages %}
                 <h1 style="color:crimson">Така пошта або логін вже зарегестрована</h1>
@@ -21,9 +21,12 @@
             <input type="email" name="email" placeholder="Введіть email..." required/>
             <label for="password">Пароль:</label>
             <input type="password" name="password" placeholder="Введіть пароль..." required/>
-            <button type="submit">Добавити</button>
+            <label>Аватарка:</label>
+            <input type="file" accept="image/" name="avatar">
+            <br>
+            <button type="submit">Зарегеструватися</button>
         </form>
-   
+        
     </div>
     <h1>Registration account</h1>
 
