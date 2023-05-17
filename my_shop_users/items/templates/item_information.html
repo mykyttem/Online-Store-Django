@@ -5,18 +5,15 @@
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/item_information.css'%}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 {% endblock %}
 
 {% block body %}
-<br>
-<br>
-<br>
 <form method="GET">
     <input type="hidden" name="button_reviews" value="item_information">
     <input type="submit" value="Відгуки">
     <span style="font-weight: bold;">{{count_reviews_item}}</span>
 </form>
-
 <br>
 
 <form method="GET">   
@@ -24,65 +21,89 @@
     <input type="submit" value="Питання">
     <span style="font-weight: bold;">{{count_questions_item}}</span>
 </form>
+                
 
-<h1 style="text-align: center;" class="name_items">{{ name_items }}</h1>
-<div class="block">
-    <div class="information-item-block">
-        <img src="/media/{{ photo }}" width="200" height="200" alt="photo item">
-        <h1>{{ items_info_price }} ₴</h1>
-        
-        {% for seller in get_seller %}
+<div class="container">
+    <div class="card">
+        <div class="container-fliud">
+            <div class="wrapper row">
+                <div class="preview col-md-6">
+                    
+                    <div class="preview-pic tab-content">
+                        <div class="tab-pane active" id="pic-1"><img src="/media/{{ photo }}" alt="photo item"></div>
+                    </div>
+                    
+                </div>
+                <div class="details col-md-6">
+                    <h3 class="product-title">{{ name_items }}<</h3>
+                    <div class="rating">
+                        <div class="stars">
+                            <span class="fa fa-star checked"></span>
+                            <span class="fa fa-star checked"></span>
+                            <span class="fa fa-star checked"></span>
+                            <span class="fa fa-star"></span>
+                            <span class="fa fa-star"></span>
+                        </div>
+                    
+                    </div>
+                    <p class="product-description">{{ items_info_description }}</p>
+                    <h4 class="price">Ціна: <span>{{ items_info_price }} ₴</span></h4>
 
-            {% if seller.id == id_user %}
-                <hr>
-                <h1>Так бачать ваш товар, інші користувачі</h1>
-            {% else %}
+                    <h2>Стан: {{state}}</h2>
+                    <h2>Номер продавця: {{phone}}</h2>
 
-                {% if amount == 0 %}
-                    <h1>Немає в наявності</h1>
-                {% else %}
+                    {% if amount > 0 %}
+                        <h2>Статус: {{status}}</h2>
+                    {% endif %}
+                    
 
-                    {% if not checking_item_in_bussket%}
-                        <form method="GET">   
-                            <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
-                            <input type="submit" value="Додати в кошик">
-                        </form>        
+                    {% if guarantee %}
+                        <h2>Гарантія: {{guarantee}} днів</h2>
                     {% else %}
-                        <hr>
-                        <h1>Товар добавлен в кошик ✔</h1>
+                        <h2>Гарантії нема</h2>
                     {% endif %}
 
-                {% endif %}
-            {% endif %}
-            <hr>
-            
-            {% if not seller.id == id_user %}
-                <h2><a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</a></h2>
-                <img id="avatar" src="/media/{{ seller.avatar_user }}" width="100" height="100" alt="sunil"> 
+                    <hr>
         
-                <input type="hidden" name="name_room_chat" id="room-name-input" value="idSeller_{{ seller.id }}_idUser_{{ id_user }}"><br>
-                <input id="room-name-submit" type="button" value="Зв'язатися з продавцем" onclick="btnWrite()">
-            {% endif %}     
 
+                    {% for seller in get_seller %}
+
+                        {% if seller.id == id_user %}
+                            <hr>
+                            <h1>Так бачать ваш товар, інші користувачі</h1>
+                        {% else %}
             
-            <h2>Номер продавця: {{phone}}</h2>
-            <h2>Стан: {{state}}</h2>
-
-            {% if amount > 0 %}
-                <h2>Статус: {{status}}</h2>
-            {% endif %}
-
+                            {% if amount == 0 %}
+                                <h1>Немає в наявності</h1>
+                            {% else %}
+            
+                                {% if not checking_item_in_bussket%}
+                                    <form method="GET">   
+                                        <input type="hidden" name="btn_shoping_basket" value="shoping_basket">
+                                        <button class="add-to-cart btn btn-default" type="submit">Добавити в кошик</button>
+                                    </form>        
+                                {% else %}
+                                    <h1>Товар добавлен в кошик ✔</h1>
+                                {% endif %}
+            
+                                {% if not seller.id == id_user %}
+                                    <h2><a href="/profile/seller/{{ seller.id }}/{{ seller.login_user }}">Продавець: {{seller.login_user}}</a></h2>
+                                    <img id="avatar" src="/media/{{ seller.avatar_user }}" width="100" height="100" alt="sunil"> 
                         
-            {% if guarantee %}
-                <h2>Гарантія: {{guarantee}} днів</h2>
-            {% else %}
-                <h2>Гарантії нема</h2>
-            {% endif %}
-        {% endfor %}
+                                    <input type="hidden" name="name_room_chat" id="room-name-input" value="idSeller_{{ seller.id }}_idUser_{{ id_user }}"><br>
+                                    <input id="room-name-submit" type="button" value="Зв'язатися з продавцем" onclick="btnWrite()">
+                                {% endif %}    
+
+                                    
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-    <h1 style="text-align: center;">Опис</h1>
-    <h1>{{ items_info_description }}</h1>
 </div>
+
 
 <script>
     function btnWrite() {

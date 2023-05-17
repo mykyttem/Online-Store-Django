@@ -17,7 +17,6 @@ def checkout(request):
     get_item_bussket = request.COOKIES.get('all_item_bussket')
 
     if not id_purchaser_session:
-        messages.success('Щоб оформити товар, потрібно увійти в акаунт або зарегеструватися')
         return redirect('sign_in')
     elif not get_item_bussket:
         messages.success('В кошику нічого немає =(')

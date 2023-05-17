@@ -9,6 +9,23 @@
 
 
 {% block body %}
+
+<style>
+    a {
+      display: inline-block;
+      padding: 10px 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-bottom: 5px;
+    }
+  
+    a:hover {
+      background-color: #45a049;
+    }
+  </style>
+
 {% for user in account %}
     <div class="profile">  
         <img src="/media/{{ user.avatar_user }}" width="200" height="200" alt="Avatar">
@@ -22,27 +39,22 @@
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="logout_profile" value="my_profile">
-            <input type="submit" value="Вийти з профіля">
+            <button type="submit">Вийти з профіля</button>
         </form>
 
-        <br>
         <a href="./create_item/">Створити товар</a>
 
-        <br><br>
         <a href="/my_orders">Подивитися мої замовлення</a>
 
-        <br><br>
         <a href="/orders_my_client">Замолвення моїх клієнтів</a>
-
-        <br><br>
 
         <a href="/my_profile/edit-profile/">Редагування акаунт</a>
 
-        <br><br>
-
+    
         <a href="/my_profile/my-chats/{{ user.id }}">Мої чати</a>
     </div>
 {% endfor %}
+
 
 {% for x in myitems %}      
     <div class="block" onclick="window.location.href='/items/{{ x.id }}/{{ x.name_items }}'">
@@ -54,7 +66,7 @@
                 <input type="submit" value="Edit item">
             </form>
     
-            <br><br>
+            <br>
 
             <form method="POST">
                 {% csrf_token %}
@@ -62,7 +74,7 @@
                 <input type="hidden" name="delete_item" value="my_profile">
                 <input type="submit" value="Delete post">
             </form>
-
+            <br>
             <img src="/media/{{ x.photo }}" width="150" height="150" alt="photo item">
             <h4> {{ x.name_items }} </h4>
             <h4>Кількість: {{ x.amount_item }} </h4>

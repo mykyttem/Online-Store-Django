@@ -9,44 +9,34 @@
 
 {% block body %}
 <div class="block">
-    <div class="information-item-block">
-        <h1>{{ name_items }}</h1>
-        <hr>
+    <h1 style="text-align: center;">Залишити відгук</h1>
 
-        {% for x in items_info %}   
-            <h1>{{ x.price }} ₴</h1>
-            <hr>
-            <h1>{{ x.description_items }}</h1>
-        {% endfor %}  
-        <hr>
-        <h1>Залишити відгук</h1>
-
-        {% for x in items_info %}   
-            <form action="/items/{{ x.id }}/{{ x.name_items }}/reviews" method="POST">
-                {% csrf_token %}
-                <!-- Get id this item -->
-                <input type="hidden" name="id_item_review" value="{{ x.id }}">
-                
-
-                <h4>Ведіть  опис відгука</h4>
-                <input type="text" name="text_review" placeholder="Введіть як вам товар" required/>
-
-                <h4>Ведіть переваги товару</h4>
-                <input type="text" name="advantages_item" placeholder="Введіть переваги товару..." required/>
-                <h4>Ведіть недоліки товару</h4>
-                <br>
-                <input type="text" name="disadvantages_item" placeholder="Введіть недоліки товару..." required/>
-                <br>
-                <br>
-                <button type="submit">Добавити</button>
-            </form>
-            
-            {% for msg in messages %}
-            <h1>Щоб залишити відгук, треба увійти в акаунт</h1> 
-            {% endfor %}
+     
+    <form action="/items/{{ x.id }}/{{ x.name_items }}/reviews" method="POST">
+        {% csrf_token %}
+        <!-- Get id this item -->
+        <input type="hidden" name="id_item_review" value="{{ x.id }}">
         
-        {% endfor %}  
-    </div>
+
+        <h4>Ведіть  опис відгука</h4>
+        <input type="text" name="text_review" placeholder="Введіть як вам товар" required/>
+
+        <h4>Ведіть переваги товару</h4>
+        <input type="text" name="advantages_item" placeholder="Введіть переваги товару..." required/>
+        <h4>Ведіть недоліки товару</h4>
+        <br>
+        <input type="text" name="disadvantages_item" placeholder="Введіть недоліки товару..." required/>
+        <br>
+        <br>
+        <button type="submit">Добавити</button>
+    </form>
+    
+    {% for msg in messages %}
+        <h1>Щоб залишити відгук, потрібно увійти в акаунт</h1> 
+    {% endfor %}
+
+
+   
 
 <br><br><br><br><br><br>
 <!-- My review -->

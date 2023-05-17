@@ -1,35 +1,20 @@
 {% extends 'base.html' %}
 
-
-{% block title %} {{ name_items }}  {% endblock %}
-
+{% block title %} {{ name_items }} {% endblock %}
 
 {% block link %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/questions_items.css'%}">
 {% endblock %}
 
-
 {% block body %}
 <script defer src="{% static 'js/questions_items.js' %}"></script>
 
-
 <div class="block">
     <div class="information-item-block">
-        <h1>{{ name_items }}</h1>
-        <hr>
-
-        {% for x in items_info %}   
-            <h1>{{ x.price }} ₴</h1>
-            <hr>
-            <h1>{{ x.description_items }}</h1>
-        {% endfor %}  
-
-        <hr>
-        <h1>Задайте питання</h1>
+        <h1 style="text-align: center;">Задайте питання</h1>
         
         {% for x in items_info %}   
-        
             <form action="/items/{{ x.id }}/{{ x.name_items }}/questions" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="id_item_Questions" value="{{ x.id }}">
@@ -46,7 +31,6 @@
             {% for msg in messages %}
             <h1>Щоб залишити питання або відгук, треба увійти в акаунт</h1> 
             {% endfor %}
-
         {% endfor %}  
 </div>
 
