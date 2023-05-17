@@ -6,7 +6,7 @@ class Order_Items(models.Model):
     client_number = models.CharField(max_length=15)
     client_name = models.CharField(max_length=30)
     client_username = models.CharField(max_length=30)
-    client_email = models.CharField(max_length=30)
+    client_email = models.EmailField(max_length=30)
     id_client = models.IntegerField()
 
     # Payment

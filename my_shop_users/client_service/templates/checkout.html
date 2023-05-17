@@ -29,7 +29,7 @@
     {% for i in json_data%}
         <div class="block" onclick="window.location.href='/items/{{ i.id_item }}/{{ i.name_items }}'">
             <ul>
-                <h1>Items</h1>
+                <img src="/media/{{ i.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ i.name_items }} </h4>
                 <h4> {{ i.price }} </h4>
             </ul>

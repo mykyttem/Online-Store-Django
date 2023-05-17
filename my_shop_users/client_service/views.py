@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
 from django.db.models import Q
 
 from accounts_users.models import Registration
@@ -17,9 +17,11 @@ def checkout(request):
     get_item_bussket = request.COOKIES.get('all_item_bussket')
 
     if not id_purchaser_session:
-        return HttpResponse('Щоб оформити товар, потрібно увійти в акаунт або зарегеструватися')  
+        messages.success('Щоб оформити товар, потрібно увійти в акаунт або зарегеструватися')
+        return redirect('sign_in')
     elif not get_item_bussket:
-        return HttpResponse('В кошику нічого немає =(')
+        messages.success('В кошику нічого немає =(')
+        return redirect('.')
     else:   
         search_my_orders = Order_Items.objects.filter(id_client=id_purchaser_session).values()
 
@@ -193,7 +195,6 @@ def room(request, room_name):
         
 
         chats = Chat_UserSeller.objects.filter(Q(id_buyer=id_user) | Q(id_seller=id_user)).values()  
-        messages_chats = MessageChat.objects.values() 
         search_list_chat = Registration.objects.all()  
         
         
@@ -203,7 +204,6 @@ def room(request, room_name):
             'name_interlocutor': search_interlocutor,
             'id_user': id_user,
             'chats': chats,
-            'message': messages_chats,
             'interlocutor': search_list_chat, 
         }
 

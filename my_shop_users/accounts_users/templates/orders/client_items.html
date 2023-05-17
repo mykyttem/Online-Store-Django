@@ -28,7 +28,7 @@
         {% for item in value %}
             <div class="block-item" onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">                        
                 <ul>
-                    <h1>PHOTO</h1>
+                    <img src="/media/{{ x.photo }}" width="150" height="150" alt="photo item">
                     <h4> {{ item.name_items }} </h4>
             
                     {% if item.old_price < item.price or item.old_price == None %}

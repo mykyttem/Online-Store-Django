@@ -22,7 +22,7 @@
             <input type="text" name="search_item_field" placeholder="Що ви шукаєте?" required/>    
             <button type="submit">Знайти</button>
           </form>
-        </ul> 
+        </ul>   
     </nav>
 
 
@@ -37,6 +37,7 @@
                     {% for i in save_value_keys%}
                         {% for item in i %}
                           <div class="block_shopping_cart" onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
+                              <img src="/media/{{ item.photo }}" width="150" height="150" alt="photo item">
                                   <h2>{{item.name_items}}</h2>
                                   <h2>{{item.price}}</h2>
                   

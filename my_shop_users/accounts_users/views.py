@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.shortcuts import render, redirect
 
 from .models import Registration
@@ -6,14 +8,24 @@ from client_service.models import Chat_UserSeller, MessageChat
 
 from django.db.models import Q
 
-from django.http import HttpResponse
-
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 
 from datetime import datetime 
 
-#TODO: добавити більше даних для користувача
+# decorator, checking session on user, whether the user is logged into the account
+def auth_user(f):
+    @wraps(f)
+    def decorated_if_session(request, *args, **kwargs):
+        # checking sesion
+        id_user = request.session.get('id')
+        if 'id' not in request.session:
+            return redirect('/sign_in')
+        return f(request, id_user, *args, **kwargs)
+    
+    return decorated_if_session
+
+
 def registration(request):
     if request.method == 'POST':
         login_user = request.POST['login']
@@ -34,7 +46,7 @@ def registration(request):
 
 
         if len(login_user) < 3:
-            return HttpResponse('Error, login name is too short')
+            return messages.success('Error, login name is too short')
         if search_email_dublicate or search_login_dublicate:
             messages.success(request, "Така пошта все зарегестрована")
         else:
@@ -75,112 +87,100 @@ def sign_in(request):
     return render(request, 'sign_in.html', {})
 
 
-def my_profile(request):
-    id_user = request.session.get('id')
-    if not id_user:
-        return HttpResponse('Ви забули увійти в аккаунт')
-    else:
-        account = Registration.objects.filter(id=id_user).values()
+@auth_user
+def my_profile(request, id_user):
+    account = Registration.objects.filter(id=id_user).values()
 
-        # button
-        logout_profile = request.POST.get('logout_profile')
-        delete_item = request.POST.get('delete_item') 
+    # button
+    logout_profile = request.POST.get('logout_profile')
+    delete_item = request.POST.get('delete_item') 
 
-        # get field from items edit
-        item_id = request.POST.get('item_id')
-        name_items_get_edit = request.POST.get('name_items_get_edit')
-    
-        myitems = Items.objects.filter(author_id_item=id_user).values() 
-    
+    # get field from items edit
+    item_id = request.POST.get('item_id')
+    name_items_get_edit = request.POST.get('name_items_get_edit')
 
-        context = {
-            'account': account,
-            'myitems': myitems
-            }
+    myitems = Items.objects.filter(author_id_item=id_user).values() 
+
+    context = {
+        'account': account,
+        'myitems': myitems
+        }
 
 
-        if request.method == 'POST':
-            if logout_profile: 
-                request.session.flush() # logout button - delete session
-                return redirect('my_profile')
+    if request.method == 'POST':
+        if logout_profile: 
+            request.session.flush() # logout button - delete session
+            return redirect('my_profile')
 
 
-            if delete_item:
-                item_id_get = Items.objects.filter(id=item_id).first() # get only ті items, які create user
-                if item_id_get and item_id_get.author_id_item == id_user: # delete item той який належить user
-                    item_id_get.delete()
-                    
-                return redirect('my_profile')
+        if delete_item:
+            item_id_get = Items.objects.filter(id=item_id).first() # get only ті items, які create user
+            if item_id_get and item_id_get.author_id_item == id_user: # delete item той який належить user
+                item_id_get.delete()
+                
+            return redirect('my_profile')
 
 
-            if edit_item:            
-                return redirect(f'edit_item/{item_id}/{name_items_get_edit}/')
-            
+        if edit_item:            
+            return redirect(f'edit_item/{item_id}/{name_items_get_edit}/')
+        
 
     return render(request, 'my_profile.html', context)
 
 
-def edit_profile(request):
-    id_user = request.session.get('id')
-    if not id_user:
-        return HttpResponse('Увійдіть в кабінет')
-    else:
-        user_account = Registration.objects.filter(id=id_user).values()
+@auth_user
+def edit_profile(request, id_user):
+    user_account = Registration.objects.filter(id=id_user).values()
 
-        if request.method == 'POST':
-            edit_login = request.POST['edit_login']
-            edit_email = request.POST['edit_email']
+    if request.method == 'POST':
+        edit_login = request.POST['edit_login']
+        edit_email = request.POST['edit_email']
 
-            actual_password = request.POST['actual_password']
-            edit_password_confirm = request.POST['password_confirm']
-            edit_avatar = request.FILES.get('edit_avatar') 
+        actual_password = request.POST['actual_password']
+        edit_password_confirm = request.POST['password_confirm']
+        edit_avatar = request.FILES.get('edit_avatar') 
 
-            edit_account = Registration.objects.get(id=id_user)
-            for i in user_account:
-                if edit_account:
+        edit_account = Registration.objects.get(id=id_user)
+        for i in user_account:
+            if edit_account:
 
-                    edit_account.login_user = edit_login
-                    edit_account.email_user = edit_email
+                edit_account.login_user = edit_login
+                edit_account.email_user = edit_email
 
-                    # checking edit to empty field or None
-                    edit_account.password_user = make_password(actual_password) if edit_password_confirm == '' else make_password(edit_password_confirm)
-                    if not edit_avatar == None:
-                        edit_account.avatar_user = edit_avatar
+                # checking edit to empty field or None
+                edit_account.password_user = make_password(actual_password) if edit_password_confirm == '' else make_password(edit_password_confirm)
+                if not edit_avatar == None:
+                    edit_account.avatar_user = edit_avatar
 
-                    
-                    if check_password(actual_password, i['password_user']):
-                        edit_account.save()
-                        request.session.flush()
-                        messages.success(request, 'Увійдіть знову, для оновлення даних у профілі')
+                
+                if check_password(actual_password, i['password_user']):
+                    edit_account.save()
+                    request.session.flush()
+                    messages.success(request, 'Увійдіть знову, для оновлення даних у профілі')
 
-                        return redirect('sign_in')
-                    elif len(edit_login) < 3:
-                        messages.success(request, "Короткий логін")
-                    else:
-                        messages.success(request, "Поточний пароль не вірний")
+                    return redirect('sign_in')
+                elif len(edit_login) < 3:
+                    messages.success(request, "Короткий логін")
+                else:
+                    messages.success(request, "Поточний пароль не вірний")
 
 
-        context = {
-            'user_account': user_account 
-        }
+    context = {
+        'user_account': user_account 
+    }
 
 
     return render(request, 'edit_profile.html', context)
 
 
-
 def my_chats(request, id):
-    # parameter "id" - get from sesion
     if not id:
-        return redirect('/items')
-
+        return redirect('/sign_in')
 
     # get data from url 
     chats = Chat_UserSeller.objects.filter(Q(id_buyer=id) | Q(id_seller=id)).values()  
     messages_chats = MessageChat.objects.values()
-    
     search_interlocutor = Registration.objects.all()  
-    
 
     context = {
         'chats': chats, 
@@ -188,7 +188,6 @@ def my_chats(request, id):
         'interlocutor': search_interlocutor, 
         'my_id': id
     }
-
 
     return render(request, 'my_chats.html', context)
 
@@ -204,109 +203,102 @@ def see_profile_seller(request, id, login):
 
     return render(request, 'profile_seller.html', context)
 
+@auth_user
+def create_item(id_user, request):
+    seller = Registration.objects.filter(id=id_user).values()
 
-def create_item(request):
-    id_seller = request.session.get('id')
-    seller = Registration.objects.filter(id=id_seller).values()
+    if request.method == 'POST':
+        name_item = request.POST['name_item']
+        description_item = request.POST['description_item']
+        category_items = request.POST['category_items']
+
+        phone_user = request.POST['phone_user']
+        price_item = request.POST['price_item']
+        
+        amount_item = request.POST['amount_item']
+        photo = request.FILES('photo')
+
+        # promotion code
+        promotion_code = request.POST['promotion_code']
+        amount_users_type = request.POST['amount_users_type']
+        guarantee = request.POST['guarantee_period']
+        at_what_price = request.POST['at_what_price']
+        validity_period_promocode = request.POST['validity_period_promocode']
+
+        status_availability = request.POST.get('status_availability') 
+        state_new = request.POST.get('state_new')
     
-    if not id_seller:
-        return HttpResponse('Увійдіть в кабінет')
-    else:
-        if request.method == 'POST':
-            name_item = request.POST['name_item']
-            description_item = request.POST['description_item']
-            category_items = request.POST['category_items']
-
-            phone_user = request.POST['phone_user']
-            price_item = request.POST['price_item']
-          
-            amount_item = request.POST['amount_item']
-
-            # promotion code
-            promotion_code = request.POST['promotion_code']
-            amount_users_type = request.POST['amount_users_type']
-            guarantee = request.POST['guarantee_period']
-            at_what_price = request.POST['at_what_price']
-            validity_period_promocode = request.POST['validity_period_promocode']
-
-            status_availability = request.POST.get('status_availability') 
-            state_new = request.POST.get('state_new')
-      
-      
-            date = datetime.now()
-           
-            new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_seller,
-                             status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=None if guarantee == '' else guarantee, amount_item=amount_item,
-                             promotion_code=None if promotion_code == '' else promotion_code, amount_type_promotion_code=None if amount_users_type == '' else amount_users_type, at_what_price=None if at_what_price == '' else at_what_price, validity_period_promocode=validity_period_promocode)
-            new_item.save()
+    
+        date = datetime.now()
+        
+        new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user,
+                            status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=None if guarantee == '' else guarantee, amount_item=amount_item,
+                            promotion_code=None if promotion_code == '' else promotion_code, amount_type_promotion_code=None if amount_users_type == '' else amount_users_type, at_what_price=None if at_what_price == '' else at_what_price, validity_period_promocode=validity_period_promocode, photo=photo)
+        new_item.save()
 
 
-            return redirect('my_profile')
+        return redirect('my_profile')
 
 
     return render(request, 'create_item.html', {'seller': seller})
 
+@auth_user
+def edit_item(request, item_id, name_items_get_edit, id_user):
+    find_item = Items.objects.filter(id=item_id)
+    find_seller = Registration.objects.filter(id=id_user)
 
-def edit_item(request, item_id, name_items_get_edit):
-    id_seller = request.session.get('id')
-    if not id_seller:
-        return HttpResponse('Увійдіть в акаунт')
-    else:
-        find_item = Items.objects.filter(id=item_id)
-        find_seller = Registration.objects.filter(id=id_seller)
-
-        context = {'find_item': find_item.values(), 
-                   'find_seller': find_seller, 
-                   'name_items_get_edit': name_items_get_edit
-                }
-        
-        old_price = [i['price'] for i in find_item.values()]          
-
-        if request.method == 'POST':
-            name_item_edit = request.POST['name_item']
-            description_item_edit = request.POST['description_item']
-            category_items_edit = request.POST['category_items']
-            phone_user_edit = request.POST['phone_user']
-            price_item_edit = request.POST['price_item']
-            guarantee_period = request.POST['guarantee_period']
-            amount_item = request.POST['amount_item']
-
-            # promotion code
-            promotion_code_edit = request.POST['promotion_code_edit']
-            amount_users_type_edit = request.POST['amount_users_type_edit']
-            at_what_price_edit = request.POST['at_what_price_edit']
-            validity_period_promocode_edit = request.POST['validity_period_promocode_edit']
-
-
-            find_item = find_item.first()
-            if find_item:
-                # save new data
-                find_item.name_items = name_item_edit
-                find_item.description_items = description_item_edit
-                find_item.category_items = category_items_edit
+    context = {'find_item': find_item.values(), 
+                'find_seller': find_seller, 
+                'name_items_get_edit': name_items_get_edit
+            }
     
-                find_item.phone = phone_user_edit
-                find_item.price = price_item_edit
+    old_price = [i['price'] for i in find_item.values()]          
 
-                find_item.guarantee = None if guarantee_period == '' else guarantee_period
-                find_item.amount_item = amount_item
+    if request.method == 'POST':
+        name_item_edit = request.POST['name_item']
+        description_item_edit = request.POST['description_item']
+        category_items_edit = request.POST['category_items']
+        phone_user_edit = request.POST['phone_user']
+        price_item_edit = request.POST['price_item']
+        guarantee_period = request.POST['guarantee_period']
+        amount_item = request.POST['amount_item']
 
-                find_item.promotion_code = promotion_code_edit
-                find_item.amount_item = amount_users_type_edit
-                find_item.at_what_price = at_what_price_edit
-                find_item.validity_period_promocode = validity_period_promocode_edit
-                
-
-                for old in old_price:
-                    find_item.old_price = old
-                    find_item.discount = ((old - int(price_item_edit)) / old) * 100 
-                        
-                find_item.save()
+        # promotion code
+        promotion_code_edit = request.POST['promotion_code_edit']
+        amount_users_type_edit = request.POST['amount_users_type_edit']
+        at_what_price_edit = request.POST['at_what_price_edit']
+        validity_period_promocode_edit = request.POST['validity_period_promocode_edit']
 
 
-                return redirect('my_profile')
+        find_item = find_item.first()
+        if find_item:
+            # save new data
+            find_item.name_items = name_item_edit
+            find_item.description_items = description_item_edit
+            find_item.category_items = category_items_edit
+
+            find_item.phone = phone_user_edit
+            find_item.price = price_item_edit
+
+            find_item.guarantee = None if guarantee_period == '' else guarantee_period
+            find_item.amount_item = amount_item
+
+            find_item.promotion_code = promotion_code_edit
+            find_item.amount_item = amount_users_type_edit
+            find_item.at_what_price = at_what_price_edit
+            find_item.validity_period_promocode = validity_period_promocode_edit
+            
+
+            for old in old_price:
+                find_item.old_price = old
+                find_item.discount = ((old - int(price_item_edit)) / old) * 100 
+                    
+            find_item.save()
+
 
             return redirect('my_profile')
-        
+
+        return redirect('my_profile')
+    
 
     return render(request, 'edit_item.html', context)

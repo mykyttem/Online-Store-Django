@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 
 from django.contrib import messages
 
@@ -124,6 +123,7 @@ def item_information(request, id, item_name):
     guarantee = items_info.guarantee
     phone = items_info.phone
     amount = items_info.amount_item
+    photo = items_info.photo
 
     # get seller this item
     get_seller = Registration.objects.filter(id=items_info.author_id_item).values()
@@ -165,6 +165,7 @@ def item_information(request, id, item_name):
             'status': status,
             'guarantee': guarantee,
             'phone': phone,
+            'photo': photo,
             
             # count 
             'count_reviews_item': count_reviews_item,
@@ -235,7 +236,8 @@ def reviews_items(request, id, item_name):
                 
                 return redirect(f'/items/{id}/{item_name}/reviews')
             else:
-                return HttpResponse('Вже все оставляли свій відгук на цьому товарі')
+                messages.success('Вже все оставляли свій відгук на цьому товарі')
+                return redirect('.')
             
     # find my review
     find_my_review_this_item = Items_Reviews.objects.filter(id_user_review=id_user_review,  id_item_review=id)
@@ -296,7 +298,7 @@ def reviews_items(request, id, item_name):
     show_my_review = Items_Reviews.objects.filter(id_user_review=id_user_review, id_item_review=id).values() 
 
     if not search_items:
-        return HttpResponse('НЕМАЄ ТАКОГО ТОВАРУ')
+        return render('not_found_item.html')
     else:
         context = {
             'name_items': item_name,
@@ -345,7 +347,8 @@ def questions_items(request, id, item_name):
                 
                 return redirect(f'/items/{id}/{item_name}/questions')
             else:
-                return HttpResponse('Вже все оставляли своє питання на цьому товарі')
+                messages.SUCCESS('Вже все оставляли своє питання на цьому товарі')
+                return redirect('.')
                
 
     find_my_Questions_this_item = Items_Questions.objects.filter(id_user_Questions=id_user_Questions, id_item_Questions=id) # "check id_user_Questions" and "id_item_Qustions_id"
@@ -458,7 +461,7 @@ def questions_items(request, id, item_name):
     
 
     if not search_items:
-        return HttpResponse('НЕМАЄ ТАКОГО ТОВАРУ')
+        return render('not_found_item.html')
     else:
         context = {
             'name_items': item_name,

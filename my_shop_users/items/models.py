@@ -14,6 +14,7 @@ class Items(models.Model):
     status = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     guarantee = models.IntegerField(blank=True, null=True)
+    photo = models.ImageField(null=True, blank=True, upload_to="avatars/", default='items/no_photo_item.png')
 
     amount_item = models.IntegerField()
     

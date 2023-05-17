@@ -66,7 +66,7 @@
     {% for item_review in reviews_result %}
         <div class="block_more_review" onclick="window.location.href='/items/{{ item_review.id }}/{{ item_review.name_items }}'">
             <ul>
-                <h1>PHOTO</h1>
+                <img src="/media/{{ item_review.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ item_review.name_items }} </h4>
     
                 {% if item_review.old_price < item_review.price or x.old_price == None %}
@@ -87,7 +87,7 @@
     {% for new_item in new_ones_first %}
         <div class="block_newItem" onclick="window.location.href='/items/{{ new_item.id }}/{{ new_item.name_items }}'">
             <ul>
-                <h1>PHOTO</h1>
+                <img src="/media/{{ new_item.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ new_item.name_items }} </h4>
     
                 {% if new_item.old_price < new_item.price or x.old_price == None %}
@@ -108,7 +108,7 @@
     {% for item_sort_сheap in items_cheap_to_expencive%}
         <div class="block_sort_cheap" onclick="window.location.href='/items/{{ item_sort_сheap.id }}/{{ item_sort_сheap.name_items }}'">
             <ul>
-                <h1>PHOTO</h1>
+                <img src="/media/{{ item_sort_cheap.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ item_sort_сheap.name_items }} </h4>
     
                 {% if item_sort_сheap.old_price < item_sort_сheap.price or x.old_price == None %}
@@ -130,7 +130,7 @@
 
         <div class="block_sort_expencive" onclick="window.location.href='/items/{{ item_sort_сheap.id }}/{{ item_sort_сheap.name_items }}'">
             <ul>
-                <h1>PHOTO</h1>
+                <img src="/media/{{ item_sort_expencive.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ item_sort_expencive.name_items }} </h4>
     
                 {% if item_sort_expencive.old_price < x.price or x.old_price == None %}
@@ -151,7 +151,7 @@
     {% for price in filter_price %}
         <div class="filter_price" onclick="window.location.href='/items/{{ price.id }}/{{ price.name_items }}'">
             <ul>
-                <h1>PHOTO</h1>
+                <img src="/media/{{ price.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ price.name_items }} </h4>
     
                 {% if price.old_price < price.price or x.old_price == None %}
@@ -172,7 +172,7 @@
     {% for item in all_items_search %}
         <div class="block" id='all_item_search' onclick="window.location.href='/items/{{ item.id }}/{{ item.name_items }}'">
             <ul>
-                <h1>PHOTO</h1>
+                <img src="/media/{{ item.photo }}" width="150" height="150" alt="photo item">
                 <h4> {{ item.name_items }} </h4>
     
                 {% if item.old_price < item.price or x.old_price == None %}

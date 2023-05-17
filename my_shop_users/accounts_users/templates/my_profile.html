@@ -63,7 +63,7 @@
                 <input type="submit" value="Delete post">
             </form>
 
-            <h1>PHOTO</h1>
+            <img src="/media/{{ x.photo }}" width="150" height="150" alt="photo item">
             <h4> {{ x.name_items }} </h4>
             <h4>Кількість: {{ x.amount_item }} </h4>
             {% if x.old_price < x.price or x.old_price == None %}
