@@ -10,6 +10,9 @@ from django.core.paginator import Paginator
 from datetime import datetime 
 import json
 
+def index(request):
+    return redirect('/items')
+
 
 def items(request):     
     # Set up Paginations
