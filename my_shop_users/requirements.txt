@@ -4,3 +4,4 @@ channels-redis==4.1.0
 daphne==4.0.0
 Django==4.2.1
 django-redis==5.2.0
+Pillow==9.5.0

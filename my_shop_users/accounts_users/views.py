@@ -11,7 +11,6 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 
-from datetime import datetime 
 
 # decorator, checking session on user, whether the user is logged into the account
 def auth_user(f):
@@ -204,7 +203,7 @@ def see_profile_seller(request, id, login):
     return render(request, 'profile_seller.html', context)
 
 @auth_user
-def create_item(id_user, request):
+def create_item(request, id_user):
     seller = Registration.objects.filter(id=id_user).values()
 
     if request.method == 'POST':
@@ -216,7 +215,7 @@ def create_item(id_user, request):
         price_item = request.POST['price_item']
         
         amount_item = request.POST['amount_item']
-        photo = request.FILES('photo')
+        photo = request.FILES.get('photo')
 
         # promotion code
         promotion_code = request.POST['promotion_code']
@@ -228,12 +227,17 @@ def create_item(id_user, request):
         status_availability = request.POST.get('status_availability') 
         state_new = request.POST.get('state_new')
     
-    
-        date = datetime.now()
-        
-        new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, joined_date=date, author_id_item=id_user,
-                            status='В наявності' if status_availability == 'on' else 'Готов к відправки', state='Новий' if state_new == 'on' else 'Вживаний', guarantee=None if guarantee == '' else guarantee, amount_item=amount_item,
-                            promotion_code=None if promotion_code == '' else promotion_code, amount_type_promotion_code=None if amount_users_type == '' else amount_users_type, at_what_price=None if at_what_price == '' else at_what_price, validity_period_promocode=validity_period_promocode, photo=photo)
+
+        new_item = Items(name_items=name_item, description_items=description_item, category_items=category_items, phone=phone_user, price=price_item, author_id_item=id_user,
+                            status='В наявності' if status_availability == 'on' else 'Готов к відправки', 
+                            state='Новий' if state_new == 'on' else 'Вживаний', 
+                            guarantee=None if guarantee == '' else guarantee, 
+                            amount_item=amount_item,
+                            promotion_code=None if promotion_code == '' else promotion_code, 
+                            amount_type_promotion_code=None if amount_users_type == '' else amount_users_type, 
+                            at_what_price=None if at_what_price == '' else at_what_price, 
+                            validity_period_promocode=None if validity_period_promocode == '' else validity_period_promocode, 
+                            photo='/items/no_photo_item.png' if photo == '' else photo)
         new_item.save()
 
 
@@ -243,7 +247,7 @@ def create_item(id_user, request):
     return render(request, 'create_item.html', {'seller': seller})
 
 @auth_user
-def edit_item(request, item_id, name_items_get_edit, id_user):
+def edit_item(request, id_user, name_items_get_edit, item_id):
     find_item = Items.objects.filter(id=item_id)
     find_seller = Registration.objects.filter(id=id_user)
 
@@ -284,9 +288,9 @@ def edit_item(request, item_id, name_items_get_edit, id_user):
             find_item.amount_item = amount_item
 
             find_item.promotion_code = promotion_code_edit
-            find_item.amount_item = amount_users_type_edit
-            find_item.at_what_price = at_what_price_edit
-            find_item.validity_period_promocode = validity_period_promocode_edit
+            find_item.amount_type_promotion_code = None if amount_users_type_edit == 'None' else amount_users_type_edit
+            find_item.at_what_price = None if at_what_price_edit == 'None' else at_what_price_edit
+            find_item.validity_period_promocode = None if validity_period_promocode_edit == 'None' else validity_period_promocode_edit
             
 
             for old in old_price:

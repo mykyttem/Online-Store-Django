@@ -35,7 +35,7 @@
 </div>
 
 <div class="create-item">
-  <form id="form-create-item" method="POST">
+  <form id="form-create-item" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       
       <label for="posting">Назва товару</label>

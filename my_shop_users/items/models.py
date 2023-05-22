@@ -6,18 +6,18 @@ class Items(models.Model):
     description_items = models.CharField(max_length=255)
     category_items = models.CharField(max_length=255)
 
-    phone = models.IntegerField()
-    price = models.IntegerField()
-    joined_date = models.DateField()
-    author_id_item = models.IntegerField()
+    phone = models.IntegerField(default=None)
+    price = models.IntegerField(default=None)
 
-    status = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
+    author_id_item = models.IntegerField(default=None)
+
+    status = models.CharField(default=None, max_length=255)
+    state = models.CharField(default=None, max_length=255)
     guarantee = models.IntegerField(blank=True, null=True)
-    photo = models.ImageField(null=True, blank=True, upload_to="avatars/", default='items/no_photo_item.png')
+    photo = models.ImageField(null=True, blank=True, upload_to="items/")
 
-    amount_item = models.IntegerField()
-    
+    amount_item = models.IntegerField(default=None)
+
     # old price
     old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -27,7 +27,7 @@ class Items(models.Model):
     amount_type_promotion_code = models.IntegerField(null=True)
     purchaser_type_code = models.JSONField(default=[])
     at_what_price = models.IntegerField(null=True)
-    validity_period_promocode = models.DateTimeField(null=True)
+    validity_period_promocode = models.DateTimeField(null=True, default=None)
 
 
 class Items_Reviews(models.Model):

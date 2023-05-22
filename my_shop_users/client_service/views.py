@@ -100,15 +100,17 @@ def checkout(request):
             order_amount = sum([i['price'] for i in json_data])
                 
             for i in find_promotion_code.values():
-                new_order_amount = order_amount - i['at_what_price'] 
+                new_order_amount = order_amount - i['at_what_price'] if i['at_what_price'] is not None else order_amount
                 discount = ((order_amount - new_order_amount) / order_amount) * 100
 
-                # # reducing available activations
+                # reducing available activations
                 find_promotion_code = find_promotion_code.first()
                 if find_promotion_code:
-                    find_promotion_code.amount_type_promotion_code -= 1
-                    find_promotion_code.purchaser_type_code.append(id_purchaser_session)
-                    find_promotion_code.save()
+                    if find_promotion_code.amount_type_promotion_code is not None:
+                        find_promotion_code.amount_type_promotion_code -= 1
+                        find_promotion_code.purchaser_type_code.append(id_purchaser_session)
+                        find_promotion_code.save()
+
 
                 # save data     
                 if 'on' == payment_upon_receipt:

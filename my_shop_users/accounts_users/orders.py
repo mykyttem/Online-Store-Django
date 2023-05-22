@@ -119,7 +119,7 @@ def my_orders(request, id_user):
 
 
 @auth_user
-def my_orders_items(request, get_id_order, id_user):
+def my_orders_items(request, id_user, get_id_order):
     delete_from_order = request.GET.get('delete_from_order')
     my_items_order = Order_Items.objects.filter(id=get_id_order, id_client=id_user).values()
 
@@ -222,7 +222,7 @@ def orders_my_client(request, id_user):
 
 
 @auth_user
-def client_items(request, get_name_client, get_id_order, id_user):
+def client_items(request, id_user, get_name_client, get_id_order):
     all_orders = Order_Items.objects.filter(id=get_id_order, authors_items__icontains=id_user).values() 
 
     data_order = {
